@@ -21291,7 +21291,7 @@ void gc_heap::plan_phase (int condemned_gen_number)
 #ifdef BACKGROUND_GC        
     if (recursive_gc_sync::background_running_p())
     {
-        dprintf (2222, ("#%Id:cs:%Ix", settings.gc_index, current_sweep_pos));
+      dprintf (2222, ("#%Id:cs:%Ix", VolatileLoad(&settings.gc_index), current_sweep_pos));
     }
 #endif //BACKGROUND_GC
 

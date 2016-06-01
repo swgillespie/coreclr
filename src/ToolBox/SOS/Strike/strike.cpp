@@ -8524,6 +8524,10 @@ DECLARE_API (DumpGCLog)
     }
 
     const char* fileName = "lastbuf.txt";
+    int iLogSize = 1024*1024;
+    int iRealLogSize = iLogSize - 1;
+    BYTE* bGCLog = nullptr;
+    DWORD dwWritten = 0;
 
     StringHolder sFileName, sLogAddr;
     CMDOption option[] = 
@@ -8544,8 +8548,10 @@ DECLARE_API (DumpGCLog)
     CLRDATA_ADDRESS StressLogAddress = NULL;
     if (sLogAddr.data != NULL)
     {
-        StressLogAddress = GetExpression(sLogAddr.data);
+      ExtOut("%s\n", sLogAddr.data);
     }
+
+    StressLogAddress = GetExpression("WKS::gc_log_buffer");
 
     //DWORD_PTR dwAddr = GetValueFromExpression(MAIN_CLR_MODULE_NAME_A "!SVR::gc_log_buffer");
     //moveN (dwAddr, dwAddr);
@@ -8592,8 +8598,7 @@ DECLARE_API (DumpGCLog)
         goto exit;
     }
 
-    int iLogSize = 1024*1024;
-    BYTE* bGCLog = new NOTHROW BYTE[iLogSize];
+    bGCLog = new NOTHROW BYTE[iLogSize];
     if (bGCLog == NULL)
     {
         ReportOOM();
@@ -8606,7 +8611,6 @@ DECLARE_API (DumpGCLog)
         ExtOut("failed to read memory from %08x\n", dwAddr);
     }
 
-    int iRealLogSize = iLogSize - 1;
     while (iRealLogSize >= 0)
     {
         if (bGCLog[iRealLogSize] != '*')
@@ -8617,7 +8621,6 @@ DECLARE_API (DumpGCLog)
         iRealLogSize--;
     }
 
-    DWORD dwWritten = 0;
     WriteFile (hGCLog, bGCLog, iRealLogSize + 1, &dwWritten, NULL);
 
     Status = S_OK;
