@@ -9859,8 +9859,8 @@ HRESULT gc_heap::initialize_gc (size_t segment_size,
 #endif //MULTIPLE_HEAPS
 
 #ifdef TRACE_GC
-    print_level = g_pConfig->GetGCprnLvl();
-    gc_trace_fac = g_pConfig->GetGCtraceFac();
+    //print_level = g_pConfig->GetGCprnLvl();
+    //gc_trace_fac = g_pConfig->GetGCtraceFac();
 #endif //TRACE_GC
 
     if (!init_semi_shared())
@@ -16378,11 +16378,11 @@ int gc_heap::garbage_collect (int n)
 #endif //MULTIPLE_HEAPS
         {
 #ifdef TRACE_GC
-            int gc_count = (int)dd_collection_count (dynamic_data_of (0));
-            if (gc_count >= g_pConfig->GetGCtraceStart())
-                trace_gc = 1;
-            if (gc_count >=  g_pConfig->GetGCtraceEnd())
-                trace_gc = 0;
+            //int gc_count = (int)dd_collection_count (dynamic_data_of (0));
+            //if (gc_count >= g_pConfig->GetGCtraceStart())
+            //    trace_gc = 1;
+            //if (gc_count >=  g_pConfig->GetGCtraceEnd())
+            //    trace_gc = 0;
 #endif //TRACE_GC
 
 #ifdef MULTIPLE_HEAPS
@@ -17103,7 +17103,8 @@ BOOL gc_heap::gc_mark1 (uint8_t* o)
 {
     BOOL marked = !marked (o);
     set_marked (o);
-    dprintf (3, ("*%Ix*, newly marked: %d", (size_t)o, marked));
+    //dprintf (3, ("*%Ix*, newly marked: %d", (size_t)o, marked));
+    dprintf (2222, ("%Ix:%d", (size_t)o, marked));
     return marked;
 }
 
@@ -17151,7 +17152,8 @@ BOOL gc_heap::background_mark1 (uint8_t* o)
 {
     BOOL to_mark = !mark_array_marked (o);
 
-    dprintf (3, ("b*%Ix*b(%d)", (size_t)o, (to_mark ? 1 : 0)));
+    //dprintf (3, ("b*%Ix*b(%d)", (size_t)o, (to_mark ? 1 : 0)));
+    dprintf (2222, ("b*%Ix:%d", (size_t)o, (to_mark ? 1 : 0)));
     if (to_mark)
     {
         mark_array_set_marked (o);
@@ -21282,6 +21284,13 @@ void gc_heap::plan_phase (int condemned_gen_number)
     size_t old_gen2_allocated = 0;
     size_t old_gen2_size = 0;
 
+#ifdef BACKGROUND_GC        
+    if (recursive_gc_sync::background_running_p())
+    {
+        dprintf (2222, ("#%Id:cs:%Ix", settings.gc_index, current_sweep_pos));
+    }
+#endif //BACKGROUND_GC
+
     if (condemned_gen_number == (max_generation - 1))
     {
         old_gen2_allocated = generation_free_list_allocated (generation_of (max_generation));
@@ -21868,7 +21877,7 @@ void gc_heap::plan_phase (int condemned_gen_number)
                     else
                     {
 #ifdef SIMPLE_DPRINTF
-                        dprintf (3, ("(%Ix)[%Ix->%Ix, NA: [%Ix(%Id), %Ix[: %Ix(%d)",
+                        dprintf (2222, ("(%Ix)[%Ix->%Ix, NA: [%Ix(%Id), %Ix[: %Ix(%d)",
                             (size_t)(node_gap_size (plug_start)), 
                             plug_start, plug_end, (size_t)new_address, (size_t)(plug_start - new_address),
                                 (size_t)new_address + ps, ps, 
@@ -28873,8 +28882,10 @@ BOOL gc_heap::can_expand_into_p (heap_segment* seg, size_t min_free_size, size_t
 
                         if (can_fit)
                         {
-                            dprintf (SEG_REUSE_LOG_0, ("(gen2)Found segment %Ix to reuse with bestfit, %s committing end of seg", 
-                                seg, (commit_end_of_seg ? "with" : "without")));
+                            //dprintf (SEG_REUSE_LOG_0, ("(gen2)Found segment %Ix to reuse with bestfit, %s committing end of seg", 
+                            dprintf (2222, ("bf:%Ix,%s", 
+                                //seg, (commit_end_of_seg ? "with" : "without")));
+                                seg, (commit_end_of_seg ? "c" : "nc")));
                         }
                         else
                         {
@@ -28885,7 +28896,8 @@ BOOL gc_heap::can_expand_into_p (heap_segment* seg, size_t min_free_size, size_t
             }
             else
             {
-                dprintf (SEG_REUSE_LOG_0, ("(gen2)Found segment %Ix to reuse without bestfit, with committing end of seg", seg));
+                //dprintf (SEG_REUSE_LOG_0, ("(gen2)Found segment %Ix to reuse without bestfit, with committing end of seg", seg));
+                dprintf (2222, ("f:%Ix,c", seg));
             }
 
             assert (additional_space <= end_space);
@@ -29064,7 +29076,8 @@ void gc_heap::realloc_plug (size_t last_plug_size, uint8_t*& last_plug,
         }
 
         last_pinned_gap = last_plug + last_plug_size;
-        dprintf (3, ("ra found pin %Ix, len: %Ix->%Ix, last_p: %Ix, last_p_size: %Ix",
+        //dprintf (3, ("ra found pin %Ix, len: %Ix->%Ix, last_p: %Ix, last_p_size: %Ix",
+        dprintf (2222, ("EP:%Ix, %Ix->%Ix, %Ix:%Ix",
             pinned_plug (m), saved_pinned_len, pinned_len (m), last_plug, last_plug_size));
         leftp = FALSE;
 
@@ -29131,7 +29144,8 @@ void gc_heap::realloc_plug (size_t last_plug_size, uint8_t*& last_plug,
 #endif //SHORT_PLUGS
                                      TRUE, active_new_gen_number REQD_ALIGN_AND_OFFSET_ARG);
 
-        dprintf (3, ("ra NA: [%Ix, %Ix[: %Ix", new_address, (new_address + last_plug_size), last_plug_size));
+        //dprintf (3, ("ra NA: [%Ix, %Ix[: %Ix", new_address, (new_address + last_plug_size), last_plug_size));
+        dprintf (2222, ("E: %Ix-%Ix:%Ix-%Ix:%Ix", last_plug, last_plug_size, new_address, (new_address + last_plug_size), last_plug_size));
         assert (new_address);
         set_node_relocation_distance (last_plug, new_address - last_plug);
 #ifdef FEATURE_STRUCTALIGN
@@ -31372,7 +31386,8 @@ void gc_heap::background_sweep()
 
     //concurrent_print_time_delta ("finished with mark and start with sweep");
     concurrent_print_time_delta ("Sw");
-    dprintf (2, ("---- (GC%d)Background Sweep Phase ----", VolatileLoad(&settings.gc_index)));
+    //dprintf (2, ("---- (GC%d)Background Sweep Phase ----", VolatileLoad(&settings.gc_index)));
+    dprintf (2222, ("---- (GC%d)BSw----", VolatileLoad(&settings.gc_index)));
 
     //block concurrent allocation for large objects
     dprintf (3, ("lh state: planning"));
@@ -31713,7 +31728,7 @@ void gc_heap::background_sweep()
     }
 
     //dprintf (GTC_LOG, ("---- (GC%d)End Background Sweep Phase ----", VolatileLoad(&settings.gc_index)));
-    dprintf (GTC_LOG, ("---- (GC%d)ESw ----", VolatileLoad(&settings.gc_index)));
+    dprintf (2222, ("---- (GC%d)ESw ----", VolatileLoad(&settings.gc_index)));
 }
 #endif //BACKGROUND_GC
 
@@ -35050,7 +35065,7 @@ void gc_heap::do_pre_gc()
 #endif //BACKGROUND_GC
 
 #ifdef BACKGROUND_GC
-    dprintf (1, ("*GC* %d(gen0:%d)(%d)(%s)(%d)", 
+    dprintf (2222, ("*GC* %d(gen0:%d)(%d)(%s)(%d)", 
         VolatileLoad(&settings.gc_index), 
         dd_collection_count (hp->dynamic_data_of (0)),
         settings.condemned_generation,
@@ -35238,7 +35253,7 @@ void gc_heap::do_post_gc()
 #endif // GC_PROFILING
 
     //dprintf (1, (" ****end of Garbage Collection**** %d(gen0:%d)(%d)", 
-    dprintf (1, ("*EGC* %d(gen0:%d)(%d)(%s)", 
+    dprintf (2222, ("*EGC* %d(gen0:%d)(%d)(%s)", 
         VolatileLoad(&settings.gc_index), 
         dd_collection_count(hp->dynamic_data_of(0)),
         settings.condemned_generation,
