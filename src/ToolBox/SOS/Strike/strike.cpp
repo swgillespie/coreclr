@@ -8523,28 +8523,52 @@ DECLARE_API (DumpGCLog)
         return Status;
     }
 
-    const char* fileName = "GCLog.txt";
+    const char* fileName = "lastbuf.txt";
 
-    while (isspace (*args))
-        args ++;
+    StringHolder sFileName, sLogAddr;
+    CMDOption option[] = 
+    {   // name, vptr, type, hasValue
+        {"-addr", &sLogAddr.data, COSTRING, TRUE}
+    };
+    CMDValue arg[] = 
+    {   // vptr, type
+        {&sFileName.data, COSTRING}
+    };
 
-    if (*args != 0)
-        fileName = args;
-    
-    DWORD_PTR dwAddr = GetValueFromExpression(MAIN_CLR_MODULE_NAME_A "!SVR::gc_log_buffer");
-    moveN (dwAddr, dwAddr);
-
-    if (dwAddr == 0)
+    size_t nArg;
+    if (!GetCMDOption(args, option, _countof(option), arg, _countof(arg), &nArg)) 
     {
-        dwAddr = GetValueFromExpression(MAIN_CLR_MODULE_NAME_A "!WKS::gc_log_buffer");
-        moveN (dwAddr, dwAddr);
-        if (dwAddr == 0)
-        {
-            ExtOut("Can't get either WKS or SVR GC's log file");
-            return E_FAIL;
-        }
+        return Status;
     }
+
+    CLRDATA_ADDRESS StressLogAddress = NULL;
+    if (sLogAddr.data != NULL)
+    {
+        StressLogAddress = GetExpression(sLogAddr.data);
+    }
+
+    //DWORD_PTR dwAddr = GetValueFromExpression(MAIN_CLR_MODULE_NAME_A "!SVR::gc_log_buffer");
+    //moveN (dwAddr, dwAddr);
+
+    //if (dwAddr == 0)
+    //{
+    //    dwAddr = GetValueFromExpression(MAIN_CLR_MODULE_NAME_A "!WKS::gc_log_buffer");
+    //    moveN (dwAddr, dwAddr);
+    //    if (dwAddr == 0)
+    //    {
+    //        ExtOut("Can't get either WKS or SVR GC's log file");
+    //        return E_FAIL;
+    //    }
+    //}
     
+    if (StressLogAddress == NULL)
+    {
+        ExtOut("Can't get GC's log file");
+        return E_FAIL;
+    }
+
+    DWORD_PTR dwAddr = StressLogAddress;
+
     ExtOut("Dumping GC log at %08x\n", dwAddr);
 
     g_bDacBroken = FALSE;
