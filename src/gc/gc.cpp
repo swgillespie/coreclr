@@ -16640,6 +16640,10 @@ int gc_heap::garbage_collect (int n)
 
                 if (do_concurrent_p)
                 {
+#ifdef FEATURE_USE_SOFTWARE_WRITE_WATCH_FOR_GC_HEAP
+                    SoftwareWriteWatch::EnableForGCHeap();
+#endif //FEATURE_USE_SOFTWARE_WRITE_WATCH_FOR_GC_HEAP
+
 #ifdef MULTIPLE_HEAPS
                     for (int i = 0; i < n_heaps; i++)
                         g_heaps[i]->current_bgc_state = bgc_initialized;
@@ -25702,7 +25706,7 @@ void gc_heap::background_mark_phase ()
 #endif //MULTIPLE_HEAPS
         {
 #ifdef FEATURE_USE_SOFTWARE_WRITE_WATCH_FOR_GC_HEAP
-            SoftwareWriteWatch::EnableForGCHeap();
+//            SoftwareWriteWatch::EnableForGCHeap();
 
             // Resetting write watch for software write watch is pretty fast, much faster than for hardware write watch. Reset
             // can be done while the runtime is suspended or after the runtime is restarted, the preference was to reset while
