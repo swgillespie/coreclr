@@ -21881,7 +21881,7 @@ void gc_heap::plan_phase (int condemned_gen_number)
                     else
                     {
 #ifdef SIMPLE_DPRINTF
-                        dprintf (2222, ("(%Ix)[%Ix->%Ix, NA: [%Ix(%Id), %Ix[: %Ix(%d)",
+                        dprintf (3, ("(%Ix)[%Ix->%Ix, NA: [%Ix(%Id), %Ix[: %Ix(%d)",
                             (size_t)(node_gap_size (plug_start)), 
                             plug_start, plug_end, (size_t)new_address, (size_t)(plug_start - new_address),
                                 (size_t)new_address + ps, ps, 
@@ -24421,6 +24421,10 @@ void  gc_heap::gcmemcopy (uint8_t* dest, uint8_t* src, size_t len, BOOL copy_car
             // The ranges [src - plug_kew .. src[ and [src + len - plug_skew .. src + len[ are ObjHeaders, which don't have GC
             // references, and are not relevant for write watch. The latter range actually corresponds to the ObjHeader for the
             // object at (src + len), so it can be ignored anyway.
+            if (settings.heap_expansion)
+            {
+                dprintf (2222, ("ww:%Ix-%Ix", dest, (dest + (len - plug_skew))));
+            }
             SoftwareWriteWatch::SetDirtyRegion(dest, len - plug_skew);
         }
 #endif // FEATURE_USE_SOFTWARE_WRITE_WATCH_FOR_GC_HEAP
@@ -26535,6 +26539,12 @@ void gc_heap::revisit_written_pages (BOOL concurrent_p, BOOL reset_only_p)
 
                         dprintf (3, ("Found %d pages [%Ix, %Ix[", 
                                         bcount, (size_t)base_address, (size_t)high_address));
+                        dprintf (2222, ("R:%Ix-%Ix:%d:%Id:%Ix,%Ix,%Ix,%Ix", base_address, region_size, 
+                            (concurrent_p ? 1 : 0), (size_t)bcount,
+                            (size_t)background_written_addresses[0],
+                            (size_t)background_written_addresses[1],
+                            (size_t)background_written_addresses[2],
+                            (size_t)background_written_addresses[3]));
                     }
 
                     if (!reset_only_p)
@@ -29149,7 +29159,8 @@ void gc_heap::realloc_plug (size_t last_plug_size, uint8_t*& last_plug,
                                      TRUE, active_new_gen_number REQD_ALIGN_AND_OFFSET_ARG);
 
         //dprintf (3, ("ra NA: [%Ix, %Ix[: %Ix", new_address, (new_address + last_plug_size), last_plug_size));
-        dprintf (2222, ("E: %Ix-%Ix:%Ix-%Ix:%Ix", last_plug, last_plug_size, new_address, (new_address + last_plug_size), last_plug_size));
+        dprintf (2222, ("E: %Ix-%Ix:%Ix-%Ix:%Ix", 
+            last_plug, (last_plug + last_plug_size), new_address, (new_address + last_plug_size), last_plug_size));
         assert (new_address);
         set_node_relocation_distance (last_plug, new_address - last_plug);
 #ifdef FEATURE_STRUCTALIGN
