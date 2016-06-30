@@ -855,6 +855,8 @@ function coreclr_code_coverage()
   exit $exitCode
 }
 
+# Sets up a memory limit for this process and all processes spawned
+# by it, using cgroups
 function set_memory_limit {
     echo "Limiting memory to $memoryLimit bytes"
     if [ "$EUID" -ne 0 ]; then
@@ -862,7 +864,7 @@ function set_memory_limit {
         exit 1
     fi
 
-    if [[ "$OSTYPE" != "linux-gnu"]]; then
+    if [[ "$OSTYPE" != "linux-gnu" ]]; then
         echo "Memory limiting only works on Linux."
         exit 1
     fi
@@ -886,10 +888,21 @@ function set_memory_limit {
     fi
 
     # create a cgroup that limits memory.
-    cgcreate -g memory:runtest_limit
-    # add this process to the cgroup
-    cgclassify -g memory:runtest_limit $$
+    if ! cgcreate -g memory:runtest_limit; then
+	echo "Failed to create cgroup"
+	exit 1
+    fi
     needToDisposeCgroup=1
+
+    # limit this cgroup's memory to the limit given to us by the command line	
+    echo "$memoryLimit" > /sys/fs/cgroup/memory/runtest_limit/memory.limit_in_bytes
+    
+    # add this process to the cgroup, so that all processes spawned by it
+    # will also be in the cgroup.
+    if ! cgclassify -g memory:runtest_limit $$; then
+	echo "Failed to add this process to cgroup"
+	exit 1
+    fi
 }
 
 function unset_memory_limit {
@@ -1036,7 +1049,7 @@ do
         --limitedDumpGeneration)
             limitedCoreDumps=ON
             ;;
-        --limit-memory)
+        --limit-memory=*)
             memoryLimit=${i#*=}
             ;;
         *)
