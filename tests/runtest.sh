@@ -60,6 +60,8 @@ function print_usage {
     echo '  --no-lf-conversion               : Do not execute LF conversion before running test script'
     echo '  --limitedDumpGeneration          : Enables the generation of a limited number of core dumps if test(s) crash, even if ulimit'
     echo '                                     is zero when launching this script. This option is intended for use in CI.'
+    echo '  --limit-memory=<bytes>           : Limits the amount of memory that the tests may consume to the given value, in bytes.'
+    echo '                                     Only works on Linux.'
     echo ''
     echo 'Runtime Code Coverage options:'
     echo '  --coreclr-coverage               : Optional argument to get coreclr code coverage reports'
@@ -300,6 +302,12 @@ function exit_with_error {
     if ((printUsage != 0)); then
         print_usage
     fi
+
+    # dispose the cgroup we set up, if we set one up.
+    if [ ! -z "$needToDisposeCgroup" ]; then
+        unset_memory_limit
+    fi
+
     exit $EXIT_CODE_EXCEPTION
 }
 
@@ -847,6 +855,51 @@ function coreclr_code_coverage()
   exit $exitCode
 }
 
+function set_memory_limit {
+    echo "Limiting memory to $memoryLimit bytes"
+    if [ "$EUID" -ne 0 ]; then
+        echo "Unable to limit memory - please run as root!"
+        exit 1
+    fi
+
+    if [[ "$OSTYPE" != "linux-gnu"]]; then
+        echo "Memory limiting only works on Linux."
+        exit 1
+    fi
+
+    if ! type cgcreate > /dev/null; then
+        echo "Memory limiting requires the 'cgcreate' program."
+        echo "This can be acquired through the 'cgroups-bin' package on Ubuntu/Debian."
+        exit 1
+    fi
+
+    if ! type cgclassify > /dev/null; then
+        echo "Memory limiting requires the 'cgclassify' program."
+        echo "This can be acquired through the 'cgroups-bin' package on Ubuntu/Debian."
+        exit 1
+    fi
+
+    if ! type cgdelete > /dev/null; then
+        echo "Memory limiting requires the 'cgdelete' program."
+        echo "This can be acquired through the 'cgroups-bin' package on Ubuntu/Debian."
+        exit 1
+    fi
+
+    # create a cgroup that limits memory.
+    cgcreate -g memory:runtest_limit
+    # add this process to the cgroup
+    cgclassify -g memory:runtest_limit $$
+    needToDisposeCgroup=1
+}
+
+function unset_memory_limit {
+    if ! cgdelete memory:runtest_limit; then
+        echo "Failed to delete the cgroup. You may need to clean this up manually."
+        echo "Command that failed: cgdelete memory:runtest_limit"
+    fi
+    needToDisposeCgroup=0
+}
+
 # Exit code constants
 readonly EXIT_CODE_SUCCESS=0       # Script ran normally.
 readonly EXIT_CODE_EXCEPTION=1     # Script exited because something exceptional happened (e.g. bad arguments, Ctrl-C interrupt).
@@ -870,6 +923,8 @@ noLFConversion=
 gcsimulator=
 longgc=
 limitedCoreDumps=
+memoryLimit=
+needToDisposeCgroup=
 
 ((disableEventLogging = 0))
 ((serverGC = 0))
@@ -981,6 +1036,9 @@ do
         --limitedDumpGeneration)
             limitedCoreDumps=ON
             ;;
+        --limit-memory)
+            memoryLimit=${i#*=}
+            ;;
         *)
             echo "Unknown switch: $i"
             print_usage
@@ -1022,6 +1080,10 @@ fi
 if [ ! -z "$gcsimulator" ]; then
     echo "Running GC simulator tests"
     export RunningGCSimulatorTests=1
+fi
+
+if [ ! -z "$memoryLimit" ]; then
+    set_memory_limit
 fi
 
 # If this is a coverage run, make sure the appropriate args have been passed
@@ -1108,6 +1170,10 @@ xunit_output_end
 if [ "$CoreClrCoverage" == "ON" ]
 then
     coreclr_code_coverage
+fi
+
+if [ ! -z "$needToDisposeCgroup" ]; then
+    unset_memory_limit
 fi
 
 if ((countFailedTests > 0)); then
