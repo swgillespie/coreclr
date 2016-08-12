@@ -2652,8 +2652,8 @@ void AppDomain::CreateADUnloadStartEvent()
     // If the thread is in cooperative mode, it must have been suspended for the GC so a delete
     // can't happen.
 
-    _ASSERTE(GCHeap::IsGCInProgress() &&
-             GCHeap::IsServerHeap()   &&
+    _ASSERTE(IGCHeap::IsGCInProgress() &&
+             IGCHeap::IsServerHeap()   &&
              IsGCSpecialThread());
 
     SystemDomain* sysDomain = SystemDomain::System();
@@ -2691,7 +2691,7 @@ void SystemDomain::ResetADSurvivedBytes()
     }
     CONTRACT_END;
 
-    _ASSERTE(GCHeap::IsGCInProgress());
+    _ASSERTE(IGCHeap::IsGCInProgress());
 
     SystemDomain* sysDomain = SystemDomain::System();
     if (sysDomain)
@@ -3824,7 +3824,7 @@ HRESULT SystemDomain::RunDllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReser
         return S_OK;
 
     // ExitProcess is called while a thread is doing GC.
-    if (dwReason == DLL_PROCESS_DETACH && GCHeap::IsGCInProgress())
+    if (dwReason == DLL_PROCESS_DETACH && IGCHeap::IsGCInProgress())
         return S_OK;
 
     // ExitProcess is called on a thread that we don't know about
@@ -5107,7 +5107,7 @@ void AppDomain::Init()
     // Ref_CreateHandleTableBucket, this is because AD::Init() can race with GC
     // and once we add ourselves to the handle table map the GC can start walking
     // our handles and calling AD::RecordSurvivedBytes() which touches ARM data.
-    if (GCHeap::IsServerHeap())
+    if (IGCHeap::IsServerHeap())
         m_dwNumHeaps = CPUGroupInfo::CanEnableGCCPUGroups() ?
                            CPUGroupInfo::GetNumActiveProcessors() :
                            GetCurrentProcessCpuCount();
@@ -11110,7 +11110,7 @@ void AppDomain::Unload(BOOL fForceUnload)
     }
     if(bForceGC)
     {
-        GCHeap::GetGCHeap()->GarbageCollect();
+        IGCHeap::GetGCHeap()->GarbageCollect();
         FinalizerThread::FinalizerThreadWait();
         SetStage(STAGE_COLLECTED);
         Close(); //NOTHROW!
@@ -11146,7 +11146,7 @@ void AppDomain::Unload(BOOL fForceUnload)
     {
         // do extra finalizer wait to remove any leftover sb entries
         FinalizerThread::FinalizerThreadWait();
-        GCHeap::GetGCHeap()->GarbageCollect();
+        IGCHeap::GetGCHeap()->GarbageCollect();
         FinalizerThread::FinalizerThreadWait();
         LogSpewAlways("Done unload %3.3d\n", unloadCount);
         DumpSyncBlockCache();
@@ -11548,7 +11548,7 @@ void AppDomain::ClearGCHandles()
 
     SetStage(STAGE_HANDLETABLE_NOACCESS);
 
-    GCHeap::GetGCHeap()->WaitUntilConcurrentGCComplete();
+    IGCHeap::GetGCHeap()->WaitUntilConcurrentGCComplete();
 
     // Keep async pin handles alive by moving them to default domain
     HandleAsyncPinHandles();
@@ -13516,8 +13516,8 @@ void SystemDomain::ProcessDelayedUnloadDomains()
     }
     CONTRACTL_END;    
 
-    int iGCRefPoint=GCHeap::GetGCHeap()->CollectionCount(GCHeap::GetGCHeap()->GetMaxGeneration());
-    if (GCHeap::GetGCHeap()->IsConcurrentGCInProgress())
+    int iGCRefPoint=IGCHeap::GetGCHeap()->CollectionCount(IGCHeap::GetGCHeap()->GetMaxGeneration());
+    if (IGCHeap::GetGCHeap()->IsConcurrentGCInProgress())
         iGCRefPoint--;
 
     BOOL bAppDomainToCleanup = FALSE;
@@ -13735,8 +13735,8 @@ void AppDomain::EnumStaticGCRefs(promote_func* fn, ScanContext* sc)
     }
     CONTRACT_END;
 
-    _ASSERTE(GCHeap::IsGCInProgress() &&
-             GCHeap::IsServerHeap()   &&
+    _ASSERTE(IGCHeap::IsGCInProgress() &&
+             IGCHeap::IsServerHeap()   &&
              IsGCSpecialThread());
 
     AppDomain::AssemblyIterator asmIterator = IterateAssembliesEx((AssemblyIterationFlags)(kIncludeLoaded | kIncludeExecution));

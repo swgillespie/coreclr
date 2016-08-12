@@ -725,7 +725,7 @@ ClrDataAccess::GetHeapAllocData(unsigned int count, struct DacpGenerationAllocDa
 
     SOSDacEnter();
 #if defined(FEATURE_SVR_GC)
-    if (GCHeap::IsServerHeap())
+    if (IGCHeap::IsServerHeap())
     {
         hr = GetServerAllocData(count, data, pNeeded);
     }
@@ -2809,7 +2809,7 @@ ClrDataAccess::GetGCHeapDetails(CLRDATA_ADDRESS heap, struct DacpGcHeapDetails *
     SOSDacEnter();
 
     // doesn't make sense to call this on WKS mode
-    if (!GCHeap::IsServerHeap())
+    if (!IGCHeap::IsServerHeap())
         hr = E_INVALIDARG;
     else
 #ifdef FEATURE_SVR_GC
@@ -2884,7 +2884,7 @@ ClrDataAccess::GetHeapSegmentData(CLRDATA_ADDRESS seg, struct DacpHeapSegmentDat
 
     SOSDacEnter();
 
-    if (GCHeap::IsServerHeap())
+    if (IGCHeap::IsServerHeap())
     {
 #if !defined(FEATURE_SVR_GC)
         _ASSERTE(0);
@@ -2924,7 +2924,7 @@ ClrDataAccess::GetGCHeapList(unsigned int count, CLRDATA_ADDRESS heaps[], unsign
     SOSDacEnter();
 
     // make sure we called this in appropriate circumstances (i.e., we have multiple heaps)
-    if (GCHeap::IsServerHeap())
+    if (IGCHeap::IsServerHeap())
     {
 #if !defined(FEATURE_SVR_GC)
         _ASSERTE(0);
@@ -2982,10 +2982,10 @@ ClrDataAccess::GetGCHeapData(struct DacpGcHeapData *gcheapData)
     if (SUCCEEDED(hr))
     {
         // Now we can get other important information about the heap
-        gcheapData->g_max_generation = GCHeap::GetMaxGeneration();
-        gcheapData->bServerMode = GCHeap::IsServerHeap();
+        gcheapData->g_max_generation = IGCHeap::GetMaxGeneration();
+        gcheapData->bServerMode = IGCHeap::IsServerHeap();
         gcheapData->bGcStructuresValid = GCScan::GetGcRuntimeStructuresValid();
-        if (GCHeap::IsServerHeap())
+        if (IGCHeap::IsServerHeap())
         {
 #if !defined (FEATURE_SVR_GC)
             _ASSERTE(0);
@@ -3014,7 +3014,7 @@ ClrDataAccess::GetOOMStaticData(struct DacpOomData *oomData)
 
     memset(oomData, 0, sizeof(DacpOomData));
 
-    if (!GCHeap::IsServerHeap())
+    if (!IGCHeap::IsServerHeap())
     {
         oom_history* pOOMInfo = &(WKS::gc_heap::oom_info);
         oomData->reason = pOOMInfo->reason;
@@ -3043,7 +3043,7 @@ ClrDataAccess::GetOOMData(CLRDATA_ADDRESS oomAddr, struct DacpOomData *data)
     SOSDacEnter();
     memset(data, 0, sizeof(DacpOomData));
 
-    if (!GCHeap::IsServerHeap())
+    if (!IGCHeap::IsServerHeap())
         hr = E_FAIL; // doesn't make sense to call this on WKS mode
     
 #ifdef FEATURE_SVR_GC
@@ -3090,7 +3090,7 @@ ClrDataAccess::GetGCInterestingInfoStaticData(struct DacpGCInterestingInfoData *
     SOSDacEnter();
     memset(data, 0, sizeof(DacpGCInterestingInfoData));
 
-    if (!GCHeap::IsServerHeap())
+    if (!IGCHeap::IsServerHeap())
     {
         for (int i = 0; i < NUM_GC_DATA_POINTS; i++)
             data->interestingDataPoints[i] = WKS::interesting_data_per_heap[i];
@@ -3123,7 +3123,7 @@ ClrDataAccess::GetGCInterestingInfoData(CLRDATA_ADDRESS interestingInfoAddr, str
     SOSDacEnter();
     memset(data, 0, sizeof(DacpGCInterestingInfoData));
 
-    if (!GCHeap::IsServerHeap())
+    if (!IGCHeap::IsServerHeap())
         hr = E_FAIL; // doesn't make sense to call this on WKS mode
     
 #ifdef FEATURE_SVR_GC
@@ -3149,7 +3149,7 @@ ClrDataAccess::GetHeapAnalyzeData(CLRDATA_ADDRESS addr, struct  DacpGcHeapAnalyz
 
     SOSDacEnter();
 
-    if (!GCHeap::IsServerHeap())
+    if (!IGCHeap::IsServerHeap())
         hr = E_FAIL; // doesn't make sense to call this on WKS mode
 
 #ifdef FEATURE_SVR_GC
@@ -3856,7 +3856,7 @@ ClrDataAccess::EnumWksGlobalMemoryRegions(CLRDataEnumMemoryFlags flags)
             // enumerating the generations from max (which is normally gen2) to max+1 gives you
             // the segment list for all the normal segements plus the large heap segment (max+1)
             // this is the convention in the GC so it is repeated here
-            for (ULONG i = GCHeap::GetMaxGeneration(); i <= GCHeap::GetMaxGeneration()+1; i++)
+            for (ULONG i = IGCHeap::GetMaxGeneration(); i <= IGCHeap::GetMaxGeneration()+1; i++)
             {
                 __DPtr<WKS::heap_segment> seg = dac_cast<TADDR>(WKS::generation_table[i].start_segment);
                 while (seg)

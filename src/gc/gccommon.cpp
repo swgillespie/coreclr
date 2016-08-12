@@ -15,10 +15,10 @@
 #include "gc.h"
 
 #ifdef FEATURE_SVR_GC
-SVAL_IMPL_INIT(uint32_t,GCHeap,gcHeapType,GCHeap::GC_HEAP_INVALID);
+SVAL_IMPL_INIT(uint32_t,IGCHeap,gcHeapType,IGCHeap::GC_HEAP_INVALID);
 #endif // FEATURE_SVR_GC
 
-GPTR_IMPL(GCHeap,g_pGCHeap);
+GPTR_IMPL(IGCHeap,g_pGCHeap);
 
 /* global versions of the card table and brick table */ 
 GPTR_IMPL(uint32_t,g_card_table);

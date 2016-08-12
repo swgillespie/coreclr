@@ -57,10 +57,10 @@ extern "C" void STDCALL WriteBarrierAssert(BYTE* ptr, Object* obj)
     if (fVerifyHeap)
     {
         obj->Validate(FALSE);
-        if(GCHeap::GetGCHeap()->IsHeapPointer(ptr))
+        if(IGCHeap::GetGCHeap()->IsHeapPointer(ptr))
         {
             Object* pObj = *(Object**)ptr;
-            _ASSERTE (pObj == NULL || GCHeap::GetGCHeap()->IsHeapPointer(pObj));
+            _ASSERTE (pObj == NULL || IGCHeap::GetGCHeap()->IsHeapPointer(pObj));
         }
     }
     else
@@ -1502,7 +1502,7 @@ void InitJITHelpers1()
 
     _ASSERTE(g_SystemInfo.dwNumberOfProcessors != 0);
 
-    JIT_TrialAlloc::Flags flags = GCHeap::UseAllocationContexts() ?
+    JIT_TrialAlloc::Flags flags = IGCHeap::UseAllocationContexts() ?
         JIT_TrialAlloc::MP_ALLOCATOR : JIT_TrialAlloc::NORMAL;
 
     // Get CPU features and check for SSE2 support.

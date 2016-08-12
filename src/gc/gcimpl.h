@@ -58,7 +58,7 @@ enum gc_reason
     reason_max
 };
 
-class GCHeap : public ::GCHeap
+class GCHeap : public ::IGCHeap
 {
 protected:
 

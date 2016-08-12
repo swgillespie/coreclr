@@ -782,7 +782,7 @@ void gc_heap::background_gc_wait_lh (alloc_wait_reason awr)
 
 
 /******************************************************************************/
-::GCHeap* CreateGCHeap() {
+IGCHeap* CreateGCHeap() {
     return new(nothrow) GCHeap();   // we return wks or svr 
 }
 

@@ -280,17 +280,17 @@ namespace _GCStress
     // GC Trigger policy classes define how a garbage collection is triggered
 
     // This is the default GC Trigger policy that simply calls 
-    // GCHeap::StressHeap
+    // IGCHeap::StressHeap
     class StressGcTriggerPolicy
     {
     public:
         FORCEINLINE
         static void Trigger()
-        { GCHeap::GetGCHeap()->StressHeap(); }
+        { IGCHeap::GetGCHeap()->StressHeap(); }
 
         FORCEINLINE
         static void Trigger(::alloc_context* acontext)
-        { GCHeap::GetGCHeap()->StressHeap(acontext); }
+        { IGCHeap::GetGCHeap()->StressHeap(acontext); }
     };
 
     // This is an overriding GC Trigger policy that triggers a GC by calling

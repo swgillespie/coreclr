@@ -640,7 +640,7 @@ void InitializeStartupFlags()
         g_fEnableARM = TRUE;
 #endif // !FEATURE_CORECLR
 
-    GCHeap::InitializeHeapType((flags & STARTUP_SERVER_GC) != 0);
+    IGCHeap::InitializeHeapType((flags & STARTUP_SERVER_GC) != 0);
 
 #ifdef FEATURE_LOADER_OPTIMIZATION            
     g_dwGlobalSharePolicy = (flags&STARTUP_LOADER_OPTIMIZATION_MASK)>>1;
@@ -3719,7 +3719,7 @@ void InitializeGarbageCollector()
     g_pFreeObjectMethodTable->SetBaseSize(ObjSizeOf (ArrayBase));
     g_pFreeObjectMethodTable->SetComponentSize(1);
 
-    GCHeap *pGCHeap = GCHeap::CreateGCHeap();
+    IGCHeap *pGCHeap = IGCHeap::CreateGCHeap();
     if (!pGCHeap)
         ThrowOutOfMemory();
 
@@ -3833,7 +3833,7 @@ BOOL STDMETHODCALLTYPE EEDllMain( // TRUE on success, FALSE on error.
                 {
                     // GetThread() may be set to NULL for Win9x during shutdown.
                     Thread *pThread = GetThread();
-                    if (GCHeap::IsGCInProgress() &&
+                    if (IGCHeap::IsGCInProgress() &&
                         ( (pThread && (pThread != ThreadSuspend::GetSuspensionThread() ))
                             || !g_fSuspendOnShutdown))
                     {

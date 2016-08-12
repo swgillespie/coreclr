@@ -97,12 +97,12 @@ struct oom_history
 class CObjectHeader;
 class Object;
 
-class GCHeap;
+class IGCHeap;
 
 /* misc defines */
 #define LARGE_OBJECT_SIZE ((size_t)(85000))
 
-GPTR_DECL(GCHeap, g_pGCHeap);
+GPTR_DECL(IGCHeap, g_pGCHeap);
 
 #ifdef GC_CONFIG_DRIVEN
 #define MAX_GLOBAL_GC_MECHANISMS_COUNT 6
@@ -141,14 +141,14 @@ extern "C" uint8_t* g_ephemeral_low;
 extern "C" uint8_t* g_ephemeral_high;
 
 namespace WKS {
-    ::GCHeap* CreateGCHeap();
+    ::IGCHeap* CreateGCHeap();
     class GCHeap;
     class gc_heap;
     }
 
 #if defined(FEATURE_SVR_GC)
 namespace SVR {
-    ::GCHeap* CreateGCHeap();
+    ::IGCHeap* CreateGCHeap();
     class GCHeap;
     class gc_heap;
 }
@@ -364,7 +364,7 @@ void record_global_mechanism (int mech_index);
 #define GC_ALLOC_ALIGN8_BIAS 0x4
 #define GC_ALLOC_ALIGN8 0x8
 
-class GCHeap {
+class IGCHeap {
     friend struct ::_DacGlobals;
 #ifdef DACCESS_COMPILE
     friend class ClrDataAccess;
@@ -372,9 +372,9 @@ class GCHeap {
     
 public:
 
-    virtual ~GCHeap() {}
+    virtual ~IGCHeap() {}
 
-    static GCHeap *GetGCHeap()
+    static IGCHeap *GetGCHeap()
     {
         LIMITED_METHOD_CONTRACT;
 
@@ -478,11 +478,11 @@ public:
     }
     
 #ifndef DACCESS_COMPILE
-    static GCHeap * CreateGCHeap()
+    static IGCHeap * CreateGCHeap()
     {
         WRAPPER_NO_CONTRACT;
 
-        GCHeap * pGCHeap;
+        IGCHeap * pGCHeap;
 
 #if defined(FEATURE_SVR_GC)
         pGCHeap = (IsServerHeap() ? SVR::CreateGCHeap() : WKS::CreateGCHeap());

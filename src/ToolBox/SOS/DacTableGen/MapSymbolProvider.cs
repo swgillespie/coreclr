@@ -183,7 +183,7 @@ public class MapFile
         // C++ field name
         //  Examples:
         //       d WKS::gc_heap::ephemeral_heap_segment
-        //       d WKS::GCHeap::hEventFinalizer
+        //       d WKS::IGCHeap::hEventFinalizer
         //       s ExecutionManager::m_CodeRangeList
         //       d ExecutionManager::m_dwReaderCount
         Reg_NmAddress +  
