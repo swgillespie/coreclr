@@ -52,6 +52,15 @@ void FinalizerThread::EnableFinalization()
 {
     WRAPPER_NO_CONTRACT;
 
+    if (IsCurrentThreadFinalizer())
+    {
+        STRESS_LOG0(LF_GC, LL_ALWAYS, "Finalizer thread setting hEventFinalizer");
+    }
+    else
+    {
+        STRESS_LOG1(LF_GC, LL_ALWAYS, "Thread 0x%x setting hEventFinalizer", GetThread()->GetThreadId());
+    }
+
     hEventFinalizer->Set();
 }
 
@@ -1064,6 +1073,8 @@ void FinalizerThread::SignalFinalizationDone(BOOL fFinalizer)
     {
         FastInterlockAnd((DWORD*)&g_FinalizerWaiterStatus, ~FWS_WaitInterrupt);
     }
+
+    STRESS_LOG0(LF_GC, LL_ALWAYS, "Finalizer thread signaling hEventFinalizerDone event");
     hEventFinalizerDone->Set();
 }
 
@@ -1090,6 +1101,8 @@ void FinalizerThread::FinalizerThreadWait(DWORD timeout)
         Thread *pThread = GetThread();
         BOOL fADUnloadHelper = (pThread && pThread->HasThreadStateNC(Thread::TSNC_ADUnloadHelper));
 
+        STRESS_LOG1(LF_GC, LL_ALWAYS, "Thread 0x%x entering WFPF\n", pThread->GetThreadId());
+
         ULONGLONG startTime = CLRGetTickCount64();
         ULONGLONG endTime;
         if (timeout == INFINITE)
@@ -1103,6 +1116,7 @@ void FinalizerThread::FinalizerThreadWait(DWORD timeout)
 
         while (TRUE)
         {
+            STRESS_LOG1(LF_GC, LL_ALWAYS, "Thread 0x%x resetting finalizer event\n", pThread->GetThreadId());
             hEventFinalizerDone->Reset();
             EnableFinalization();
 
@@ -1116,9 +1130,12 @@ void FinalizerThread::FinalizerThreadWait(DWORD timeout)
                 timeout = GetEEPolicy()->GetTimeout(OPR_FinalizerRun);
             }
 
+            STRESS_LOG1(LF_GC, LL_ALWAYS, "Thread 0x%x preparing to wait on finalizer done event\n", pThread->GetThreadId());
             DWORD status = hEventFinalizerDone->Wait(timeout,TRUE);
+            STRESS_LOG1(LF_GC, LL_ALWAYS, "Thread 0x%x awoken after waiting on finalizer done event\n", pThread->GetThreadId());
             if (status != WAIT_TIMEOUT && !(g_FinalizerWaiterStatus & FWS_WaitInterrupt))
             {
+                STRESS_LOG1(LF_GC, LL_ALWAYS, "Thread 0x%x: WFPF returning, status wasn't wait timeout or interruptable wait\n", pThread->GetThreadId());
                 return;
             }
             if (!fADUnloadHelper)
@@ -1129,6 +1146,7 @@ void FinalizerThread::FinalizerThreadWait(DWORD timeout)
                     ULONGLONG curTime = CLRGetTickCount64();
                     if (curTime >= endTime)
                     {
+                        STRESS_LOG1(LF_GC, LL_ALWAYS, "Thread 0x%x: fADUnloadHelper\n", pThread->GetThreadId());
                         return;
                     }
                     else
@@ -1139,6 +1157,7 @@ void FinalizerThread::FinalizerThreadWait(DWORD timeout)
             }
             else
             {
+                STRESS_LOG1(LF_GC, LL_ALWAYS, "Thread 0x%x: WFPF wait timed out\n", pThread->GetThreadId());
                 if (status == WAIT_TIMEOUT)
                 {
                     ULONGLONG finalizeStartTime = GetObjFinalizeStartTime();
@@ -1199,13 +1218,13 @@ BOOL FinalizerThread::FinalizerThreadWatchDog()
         !(g_fEEShutDown & ShutDown_Finalize2)) {
         ShutdownEnd = CLRGetTickCount64() + GetEEPolicy()->GetTimeout(OPR_ProcessExit);
         // Wait for the finalizer...
-        LOG((LF_GC, LL_INFO10, "Signalling finalizer to quit..."));
+        LOG((LF_GC, LL_ALWAYS, "Signalling finalizer to quit... (resetting hEventFinalizerDone)"));
 
         fQuitFinalizer = TRUE;
         hEventFinalizerDone->Reset();
         EnableFinalization();
 
-        LOG((LF_GC, LL_INFO10, "Waiting for finalizer to quit..."));
+        LOG((LF_GC, LL_ALWAYS, "Waiting for finalizer to quit..."));
         
         if (pThread)
         {
