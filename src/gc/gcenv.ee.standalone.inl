@@ -207,6 +207,12 @@ ALWAYS_INLINE void GCToEEInterface::EnableFinalization(bool foundFinalizers)
     g_theGCToCLR->EnableFinalization(foundFinalizers);
 }
 
+ALWAYS_INLINE void* GCToEEInterface::GetConfigValue(const char *key)
+{
+    assert(g_theGCToCLR != nullptr);
+    return g_theGCToCLR->GetConfigValue(key);
+}
+
 #undef ALWAYS_INLINE
 
 #endif // __GCTOENV_EE_STANDALONE_INL__

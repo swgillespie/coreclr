@@ -68,6 +68,7 @@ public:
     static void StompWriteBarrier(WriteBarrierParameters* args);
 
     static void EnableFinalization(bool foundFinalizers);
+    static void* GetConfigValue(const char *key);
 };
 
 #endif // __GCENV_EE_H__

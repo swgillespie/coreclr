@@ -133,6 +133,9 @@ public:
     // be finalized.
     virtual
     void EnableFinalization(bool foundFinalizers) = 0;
+
+    virtual
+    void* GetConfigValue(const char *value) = 0;
 };
 
 #endif // _GCINTERFACE_EE_H_

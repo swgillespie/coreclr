@@ -23,6 +23,7 @@ set( GC_SOURCES_DAC_AND_WKS_COMMON
   gcscan.cpp
   gcsvr.cpp
   gcwks.cpp
+  gcconfig.cpp
   handletable.cpp
   handletablecore.cpp
   handletablescan.cpp

@@ -44,6 +44,7 @@ public:
     void StompWriteBarrier(WriteBarrierParameters* args);
 
     void EnableFinalization(bool foundFinalizers);
+    void *GetConfigValue(const char *key);
 };
 
 #endif // FEATURE_STANDALONE_GC

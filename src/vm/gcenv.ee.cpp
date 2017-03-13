@@ -1330,3 +1330,8 @@ void GCToEEInterface::EnableFinalization(bool foundFinalizers)
         FinalizerThread::EnableFinalization();
     }
 }
+
+void* GCToEEInterface::GetConfigValue(const char *key)
+{
+    return nullptr;
+}

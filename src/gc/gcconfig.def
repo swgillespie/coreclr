@@ -1,0 +1,30 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+#ifndef GC_CONFIG
+ #define GC_CONFIG(type, name)
+#endif
+
+GC_CONFIG(int,    HeapVerifyLevel)
+GC_CONFIG(size_t, SegmentSize)
+GC_CONFIG(int,    GCLatencyMode)
+GC_CONFIG(bool,   GCRetainVM)
+GC_CONFIG(bool,   GCConcurrent)
+GC_CONFIG(int,    GCprnLvl)
+GC_CONFIG(int,    GCtraceFac)
+GC_CONFIG(int,    GCLOHCompactionMode)
+GC_CONFIG(bool,   GCBreakOnOOMEnabled)
+GC_CONFIG(bool,   GCStressMix)
+GC_CONFIG(int,    GCtraceStart)
+GC_CONFIG(int,    GCtraceStop)
+GC_CONFIG(bool,   GCConservative)
+GC_CONFIG(bool,   GCForceCompact)
+GC_CONFIG(bool,   GCNoAffinitize)
+GC_CONFIG(int,    GCHeapCount)
+GC_CONFIG(int,    FastGCStressLevel)
+GC_CONFIG(int,    GCStressStep)
+GC_CONFIG(bool,   AppDomainLeaks)
+GC_CONFIG(int,    GCgen0Size)
+
+#undef GC_CONFIG
