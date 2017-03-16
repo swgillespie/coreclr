@@ -275,6 +275,8 @@ typedef uintptr_t TADDR;
 
 #define SVAL_DECL(type, var) \
     static type var
+#define SVAL_IMPL_INIT(type, cls, var, init) \
+    type cls::var = init
 #define SVAL_IMPL_NS(type, ns, cls, var) \
     type cls::var
 #define SVAL_IMPL_NS_INIT(type, ns, cls, var, init) \
@@ -300,6 +302,10 @@ typedef DPTR(uint8_t)   PTR_uint8_t;
 #define DECLSPEC_ALIGN(x)   __declspec(align(x))
 
 #define OS_PAGE_SIZE 4096
+
+#ifndef ASSERT
+#define ASSERT(expr) assert(expr)
+#endif
 
 #ifndef _ASSERTE
 #define _ASSERTE(_expr) ASSERT(_expr)
@@ -603,5 +609,56 @@ public:
     static void GetGroupForProcessor(uint16_t processor_number, uint16_t * group_number, uint16_t * group_processor_number);
 };
 
+// START workarounds by sean
+
+#define MAX_LONGPATH 1024
+
+#ifdef _MSC_VER
+#define SUPPRESS_WARNING_4127   \
+    __pragma(warning(push))     \
+    __pragma(warning(disable:4127)) /* conditional expression is constant*/
+#define POP_WARNING_STATE       \
+    __pragma(warning(pop))
+#else // _MSC_VER
+#define SUPPRESS_WARNING_4127
+#define POP_WARNING_STATE
+#endif // _MSC_VER
+
+#define WHILE_0             \
+    SUPPRESS_WARNING_4127   \
+    while(0)                \
+    POP_WARNING_STATE       \
+
+#define LL_INFO10 4
+
+#define STRESS_LOG_VA(msg)                                              do { } WHILE_0
+#define STRESS_LOG0(facility, level, msg)                               do { } WHILE_0
+#define STRESS_LOG1(facility, level, msg, data1)                        do { } WHILE_0
+#define STRESS_LOG2(facility, level, msg, data1, data2)                 do { } WHILE_0
+#define STRESS_LOG3(facility, level, msg, data1, data2, data3)          do { } WHILE_0
+#define STRESS_LOG4(facility, level, msg, data1, data2, data3, data4)   do { } WHILE_0
+#define STRESS_LOG5(facility, level, msg, data1, data2, data3, data4, data5)   do { } WHILE_0
+#define STRESS_LOG6(facility, level, msg, data1, data2, data3, data4, data5, data6)   do { } WHILE_0
+#define STRESS_LOG7(facility, level, msg, data1, data2, data3, data4, data5, data6, data7)   do { } WHILE_0
+#define STRESS_LOG_PLUG_MOVE(plug_start, plug_end, plug_delta)          do { } WHILE_0
+#define STRESS_LOG_ROOT_PROMOTE(root_addr, objPtr, methodTable)         do { } WHILE_0
+#define STRESS_LOG_ROOT_RELOCATE(root_addr, old_value, new_value, methodTable) do { } WHILE_0
+#define STRESS_LOG_GC_START(gcCount, Gen, collectClasses)               do { } WHILE_0
+#define STRESS_LOG_GC_END(gcCount, Gen, collectClasses)                 do { } WHILE_0
+#define STRESS_LOG_OOM_STACK(size)   do { } while(0)
+#define STRESS_LOG_RESERVE_MEM(numChunks) do {} while (0)
+#define STRESS_LOG_GC_STACK
+
+#define LOG(x)
+
+typedef Object** PTR_PTR_Object;
+#define __stdcall
+
+extern EEConfig* g_pConfig;
+
+void ValidateAppDomainForHandle(void*);
+void ValidateAssignObjrefForHandle(void*, ADIndex);
+
+#define ETW_EVENT_ENABLED(a, b) false
 
 #endif // __GCENV_BASE_INCLUDED__

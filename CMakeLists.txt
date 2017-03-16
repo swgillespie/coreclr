@@ -561,6 +561,14 @@ if(WIN32)
   add_subdirectory(src/gc/sample)
 endif()
 
+if(FEATURE_STANDALONE_GC)
+  add_definitions(-DFEATURE_STANDALONE_GC)
+  add_subdirectory(src/gc)
+  if(CLR_CMAKE_PLATFORM_UNIX)
+    add_subdirectory(src/gc/unix)
+  endif(CLR_CMAKE_PLATFORM_UNIX)
+endif(FEATURE_STANDALONE_GC)
+
 # Above projects do not build with these compile options
 # All of the compiler options are specified in file compileoptions.cmake
 # Do not add any new options here. They shoul be added in compileoptions.cmake
@@ -575,14 +583,6 @@ endif(WIN32)
 # Include the basic prebuilt headers - required for getting fileversion resource details.
 include_directories("src/pal/prebuilt/inc")
 include_directories("bin/obj")
-
-if(FEATURE_STANDALONE_GC)
-  add_definitions(-DFEATURE_STANDALONE_GC)
-
-  if(CLR_CMAKE_PLATFORM_UNIX)
-    add_subdirectory(src/gc/unix)
-  endif(CLR_CMAKE_PLATFORM_UNIX)
-endif(FEATURE_STANDALONE_GC)
 
 if (CLR_CMAKE_PLATFORM_UNIX)
   include_directories("src/pal/inc")

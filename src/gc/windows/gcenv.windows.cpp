@@ -2,15 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-#include <cstdint>
-#include <cassert>
-#include <cstddef>
-#include <memory>
 #include "windows.h"
 #include "psapi.h"
-#include "env/gcenv.structs.h"
-#include "env/gcenv.base.h"
-#include "env/gcenv.os.h"
+#include "common.h"
+#include "gcenv.h"
+#include <memory>
 
 GCSystemInfo g_SystemInfo;
 
@@ -53,7 +49,7 @@ static size_t GetRestrictedPhysicalMemoryLimit()
     PIS_PROCESS_IN_JOB GCIsProcessInJob = 0;
     PQUERY_INFORMATION_JOB_OBJECT GCQueryInformationJobObject = 0;
 
-    hinstKernel32 = LoadLibraryEx(L"kernel32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    hinstKernel32 = LoadLibraryEx("kernel32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (!hinstKernel32)
         goto exit;
 

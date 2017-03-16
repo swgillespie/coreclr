@@ -263,6 +263,23 @@ void GCToEEInterface::EnableFinalization(bool foundFinalizers)
     // TODO: Implement for finalization
 }
 
+int     EEConfig::GetHeapVerifyLevel() { return 0; }
+EEConfig::GCStressFlags EEConfig::GetGCStressLevel() { return GCSTRESS_NONE; }
+bool    EEConfig::IsGCStressMix()          { return false; }
+int     EEConfig::GetGCtraceStart()        { return 0; }
+int     EEConfig::GetGCtraceEnd()          { return 0; }
+int     EEConfig::GetGCtraceFac()          { return 0; }
+int     EEConfig::GetGCprnLvl()            { return 0; }
+bool    EEConfig::IsGCBreakOnOOMEnabled()  { return false; }
+int     EEConfig::GetGCgen0size()          { return 0; }
+size_t  EEConfig::GetSegmentSize()         { return 0; }
+bool    EEConfig::GetGCconcurrent()        { return 1; }
+int     EEConfig::GetGCLatencyMode()       { return 1; }
+bool    EEConfig::GetGCForceCompact()      { return 0; }
+bool    EEConfig::GetGCRetainVM()          { return 0; }
+int     EEConfig::GetGCLOHCompactionMode() { return 0; }
+bool    EEConfig::GetGCConservative()      { return true; }
+
 bool IsGCSpecialThread()
 {
     // TODO: Implement for background GC

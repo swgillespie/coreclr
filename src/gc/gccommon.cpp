@@ -80,7 +80,7 @@ int32_t g_bLowMemoryFromHost = 0;
     // called by the write barrier to update the shadow heap
 void updateGCShadow(Object** ptr, Object* val)
 {
-    Object** shadow = (Object**) &g_GCShadow[((uint8_t*) ptr - g_lowest_address)];
+    Object** shadow = (Object**) &g_GCShadow[((uint8_t*) ptr - g_gc_lowest_address)];
     if ((uint8_t*) shadow < g_GCShadowEnd)
     {
         *shadow = val;

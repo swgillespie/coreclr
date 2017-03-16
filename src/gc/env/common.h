@@ -26,6 +26,10 @@
 
 #ifdef PLATFORM_UNIX
 #include <pthread.h>
+#else
+#ifndef UNICODE
+#define UNICODE
+#endif
 #endif
 
-using namespace std;
+using std::nothrow;

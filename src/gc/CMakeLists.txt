@@ -1,8 +1,13 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}) 
-include_directories(BEFORE ${CLR_DIR}/src/vm)
-include_directories(BEFORE ${CLR_DIR}/src/vm/${ARCH_SOURCES_DIR})
+
+if(FEATURE_STANDALONE_GC)
+  include_directories(env)
+else()
+  include_directories(BEFORE ${CLR_DIR}/src/vm)
+  include_directories(BEFORE ${CLR_DIR}/src/vm/${ARCH_SOURCES_DIR})
+endif(FEATURE_STANDALONE_GC)
 
 if(CLR_CMAKE_PLATFORM_UNIX)
   add_compile_options(-fPIC)
@@ -49,5 +54,9 @@ endif(FEATURE_STANDALONE_GC)
 convert_to_absolute_path(GC_SOURCES_WKS ${GC_SOURCES_WKS})
 convert_to_absolute_path(GC_SOURCES_DAC ${GC_SOURCES_DAC})
 
-add_subdirectory(wks)
-add_subdirectory(dac)
+if(FEATURE_STANDALONE_GC)
+  add_library(gc_wks STATIC ${GC_SOURCES_WKS})
+else()
+  add_subdirectory(wks)
+  add_subdirectory(dac)
+endif(FEATURE_STANDALONE_GC)
