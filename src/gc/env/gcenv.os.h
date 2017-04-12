@@ -91,6 +91,16 @@ public:
     //      WAIT_TIMEOUT  - The timeout interval expired without this event being signalled.
     //      WAIT_FAILED   - The wait failed.
     uint32_t Wait(uint32_t timeout, bool alertable);
+
+    bool IsValid() const
+    {
+        return m_impl != nullptr;
+    }
+
+    bool CreateManualEventNoThrow(bool initialState);
+    bool CreateAutoEventNoThrow(bool initialState);
+    bool CreateOSManualEventNoThrow(bool initialState);
+    bool CreateOSAutoEventNoThrow(bool initialState);
 };
 
 // GC thread function prototype
@@ -323,34 +333,6 @@ public:
     // Return:
     //  Time stamp in milliseconds
     static uint32_t GetLowPrecisionTimeStamp();
-
-    //
-    // Events
-    //
-
-    // Constructs a new host-aware auto-resetting event.
-    // Return:
-    //   A newly-constructed event in the specified signal state, or
-    //   nullptr if the initialization of the event failed.
-    static GCEvent* CreateAutoEvent(bool initialState);
-
-    // Constructs a new host-aware manual-resetting event.
-    // Return:
-    //   A newly-constructed event in the specified signal state, or
-    //   nullptr if the initialization of the event failed.
-    static GCEvent* CreateManualEvent(bool initialState);
-
-    // Constructs a new auto-resetting event.
-    // Return:
-    //   A newly-constructed event in the specified signal state, or
-    //   nullptr if the initialization of the event failed.
-    static GCEvent* CreateOSAutoEvent(bool initialState);
-
-    // Constructs a new manual-resetting event.
-    // Return:
-    //   A newly-constructed event in the specified signal state, or
-    //   nullptr if the initialization of the event failed.
-    static GCEvent* CreateOSManualEvent(bool initialState);
 };
 
 #endif // __GCENV_OS_H__
