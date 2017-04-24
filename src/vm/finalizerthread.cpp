@@ -393,6 +393,8 @@ void FinalizerThread::ProcessProfilerAttachIfNecessary(ULONGLONG * pui64Timestam
 
 #endif // FEATURE_PROFAPI_ATTACH_DETACH
 
+
+
 void FinalizerThread::WaitForFinalizerEvent (CLREvent *event)
 {
     // Non-host environment
@@ -415,15 +417,21 @@ void FinalizerThread::WaitForFinalizerEvent (CLREvent *event)
     switch (event->Wait(2000, FALSE))
     {
     case (WAIT_OBJECT_0):
+        printf("Finalizer thread immediate exit: object 0\n");
         return;
     case (WAIT_ABANDONED):
+        printf("Finalizer thread immediate exit: abandoned\n");
         return;
     case (WAIT_TIMEOUT):
+        printf("Finalizer thread immediate wait timeout\n");
         break;
     }
+
+    printf("Finalizer thread entering event loop\n");
     MHandles[kFinalizer] = event->GetHandleUNHOSTED();
     while (1)
     {
+        printf("Finalizer thread at top of event loop\n");
         // WaitForMultipleObjects will wait on the event handles in MHandles
         // starting at this offset
         UINT uiEventIndexOffsetForWait = 0;
@@ -466,6 +474,7 @@ void FinalizerThread::WaitForFinalizerEvent (CLREvent *event)
         }
 #endif //FEATURE_PROFAPI_ATTACH_DETACH 
 
+        printf("Finalizer thread dropping into hard wait on events\n");
         switch (WaitForMultipleObjectsEx(
             cEventsForWait,                           // # objects to wait on
             &(MHandles[uiEventIndexOffsetForWait]),   // array of objects to wait on
@@ -482,6 +491,7 @@ void FinalizerThread::WaitForFinalizerEvent (CLREvent *event)
             + uiEventIndexOffsetForWait)
         {
         case (WAIT_OBJECT_0 + kLowMemoryNotification):
+            printf("Finalizer thread received low memory notification\n");
             //short on memory GC immediately
             GetFinalizerThread()->DisablePreemptiveGC();
             GCHeapUtilities::GetGCHeap()->GarbageCollect(0, true);
@@ -498,9 +508,11 @@ void FinalizerThread::WaitForFinalizerEvent (CLREvent *event)
             }
             break;
         case (WAIT_OBJECT_0 + kFinalizer):
+            printf("Finalizer thread received finalizer event\n");
             return;
 #ifdef FEATURE_PROFAPI_ATTACH_DETACH
         case (WAIT_OBJECT_0 + kProfilingAPIAttach):
+            printf("Finalizer thread received profiler attach event\n");
             // Spawn thread to perform the profiler attach, then resume our wait
             ProfilingAPIAttachDetach::ProcessSignaledAttachEvent();
             break;
@@ -554,6 +566,7 @@ VOID FinalizerThread::FinalizerThreadWorker(void *args)
             GetFinalizerThread()->m_GCOnTransitionsOK = FALSE;
         }
 #endif
+        printf("Finalizer thread preemp transition\n");
         GetFinalizerThread()->EnablePreemptiveGC();
 #ifdef _DEBUG
         if (g_pConfig->FastGCStressLevel())
@@ -569,6 +582,8 @@ VOID FinalizerThread::FinalizerThreadWorker(void *args)
 #endif //0
 
         WaitForFinalizerEvent (hEventFinalizer);
+
+        printf("Finalizer thread is now awake\n");
 
 #if defined(__linux__) && defined(FEATURE_EVENT_TRACE)
         if (g_TriggerHeapDump && (CLRGetTickCount64() > (LastHeapDumpTime + LINUX_HEAP_DUMP_TIME_OUT)))
@@ -590,6 +605,7 @@ VOID FinalizerThread::FinalizerThreadWorker(void *args)
                 bPriorityBoosted = TRUE;
         }
 
+        printf("Finalizer thread coop transition\n");
         GetFinalizerThread()->DisablePreemptiveGC();
 
         // TODO: The following call causes 12 more classes loaded.
@@ -623,6 +639,7 @@ VOID FinalizerThread::FinalizerThreadWorker(void *args)
         // check and do it
         if (GetFinalizerThread()->HaveExtraWorkForFinalizer())
         {
+            printf("Finalizer thread doing extra work for finalizer\n");
             GetFinalizerThread()->DoExtraWorkForFinalizer();
         }
         LOG((LF_GC, LL_INFO100, "***** Calling Finalizers\n"));
@@ -634,6 +651,7 @@ VOID FinalizerThread::FinalizerThreadWorker(void *args)
         FastInterlockExchange ((LONG*)&g_FinalizerIsRunning, TRUE);
         AppDomain::EnableADUnloadWorkerForFinalizer();
 
+        printf("Finalizer thread running finalizers\n");
         do
         {
             FinalizeAllObjects(NULL, 0);
@@ -686,6 +704,7 @@ VOID FinalizerThread::FinalizerThreadWorker(void *args)
         // race in that another thread starting a drain, as we leave a drain, may
         // consider itself satisfied by the drain that just completed.  This is
         // acceptable.
+        printf("Finalizer thread signalling that finalization is complete\n");
         SignalFinalizationDone(TRUE);
     }
 }
@@ -937,6 +956,8 @@ void FinalizerThread::SignalFinalizationDone(BOOL fFinalizer)
     {
         FastInterlockAnd((DWORD*)&g_FinalizerWaiterStatus, ~FWS_WaitInterrupt);
     }
+
+    printf("Finalizer thread setting hEventFinalizerDone\n");
     hEventFinalizerDone->Set();
 }
 
@@ -947,6 +968,7 @@ void FinalizerThread::FinalizerThreadWait(DWORD timeout)
     ASSERT(hEventFinalizer->IsValid());
     ASSERT(GetFinalizerThread());
 
+    printf("FinalizerThreadWait: entry\n");
     // Can't call this from within a finalized method.
     if (!IsCurrentThreadFinalizer())
     {
@@ -958,6 +980,7 @@ void FinalizerThread::FinalizerThreadWait(DWORD timeout)
             g_pRCWCleanupList->CleanupWrappersInCurrentCtxThread();
 #endif // FEATURE_COMINTEROP
 
+        printf("FinalizerThreadWait: preemp transition\n");
         GCX_PREEMP();
 
         Thread *pThread = GetThread();
@@ -976,6 +999,7 @@ void FinalizerThread::FinalizerThreadWait(DWORD timeout)
 
         while (TRUE)
         {
+            printf("FinalizerThreadWait: resetting hEventFinalizerDone\n");
             hEventFinalizerDone->Reset();
             EnableFinalization();
 
@@ -989,9 +1013,11 @@ void FinalizerThread::FinalizerThreadWait(DWORD timeout)
                 timeout = GetEEPolicy()->GetTimeout(OPR_FinalizerRun);
             }
 
+            printf("FinalizerThreadWait: waiting on hEventFinalizerDone\n");
             DWORD status = hEventFinalizerDone->Wait(timeout,TRUE);
             if (status != WAIT_TIMEOUT && !(g_FinalizerWaiterStatus & FWS_WaitInterrupt))
             {
+                printf("FinalizerThreadWait: Wait successful, returning\n");
                 return;
             }
             if (!fADUnloadHelper)
