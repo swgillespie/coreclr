@@ -583,6 +583,7 @@ if(FEATURE_STANDALONE_GC)
   if(CLR_CMAKE_PLATFORM_UNIX)
     add_subdirectory(src/gc/unix)
   endif(CLR_CMAKE_PLATFORM_UNIX)
+  add_subdirectory(src/gc)
 endif(FEATURE_STANDALONE_GC)
 
 if(FEATURE_STANDALONE_GC_ONLY)
