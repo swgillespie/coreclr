@@ -73,67 +73,6 @@ namespace
 #define SVAL_IMPL_INIT(type, cls, var, init) \
     type cls::var = init
 
-//
-// Thread
-//
-
-struct alloc_context;
-
-class Thread
-{
-    uint32_t m_fPreemptiveGCDisabled;
-    uintptr_t m_alloc_context[16]; // Reserve enough space to fix allocation context
-
-    friend class ThreadStore;
-    Thread * m_pNext;
-
-public:
-    Thread()
-    {
-    }
-
-    bool PreemptiveGCDisabled()
-    {
-        return !!m_fPreemptiveGCDisabled;
-    }
-
-    void EnablePreemptiveGC()
-    {
-        m_fPreemptiveGCDisabled = false;
-    }
-
-    void DisablePreemptiveGC()
-    {
-        m_fPreemptiveGCDisabled = true;
-    }
-
-    alloc_context* GetAllocContext()
-    {
-        return (alloc_context *)&m_alloc_context;
-    }
-
-    void SetGCSpecial(bool fGCSpecial)
-    {
-    }
-
-    bool CatchAtSafePoint()
-    {
-        // This is only called by the GC on a background GC worker thread that's explicitly interested in letting
-        // a foreground GC proceed at that point. So it's always safe to return true.
-        return true;
-    }
-};
-
-Thread * GetThread();
-
-class ThreadStore
-{
-public:
-    static Thread * GetThreadList(Thread * pThread);
-
-    static void AttachCurrentThread();
-};
-
 // -----------------------------------------------------------------------------------------------------------
 // Config file enumulation
 //
@@ -157,7 +96,7 @@ public:
         HEAPVERIFY_DEEP_ON_COMPACT = 0x80    // Performs deep object verfication only on compacting GCs.
     };
 
-    enum  GCStressFlags {
+    enum GCStressFlags {
         GCSTRESS_NONE = 0,
         GCSTRESS_ALLOC = 1,    // GC on all allocs and 'easy' places
         GCSTRESS_TRANSITION = 2,    // GC on transitions to preemptive GC
