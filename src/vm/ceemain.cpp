@@ -484,8 +484,8 @@ void InitializeStartupFlags()
         g_IGCconcurrent = 0;
 
 
-    InitializeHeapType((flags & STARTUP_SERVER_GC) != 0);
     g_heap_type = (flags & STARTUP_SERVER_GC) == 0 ? GC_HEAP_WKS : GC_HEAP_SVR;
+    g_IGCHoardVM = (flags & STARTUP_HOARD_GC_VM) == 0 ? 0 : 1;
 
 #ifdef FEATURE_LOADER_OPTIMIZATION            
     g_dwGlobalSharePolicy = (flags&STARTUP_LOADER_OPTIMIZATION_MASK)>>1;
