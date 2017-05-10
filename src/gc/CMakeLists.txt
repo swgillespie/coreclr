@@ -11,6 +11,15 @@ if(CLR_CMAKE_PLATFORM_UNIX)
   add_compile_options(-Wno-format)
 endif(CLR_CMAKE_PLATFORM_UNIX)
 
+if(CLR_CMAKE_PLATFORM_DARWIN)
+  add_definitions(-D_DARWIN_C_SOURCE)
+endif(CLR_CMAKE_PLATFORM_DARWIN)
+
+remove_definitions(-DFEATURE_EVENT_TRACE)
+remove_definitions(-DPROFILING_SUPPORTED)
+remove_definitions(-DSTRESS_HEAP)
+remove_definitions(-DFEATURE_APPDOMAIN_RESOURCE_MONITORING)
+
 set( GC_SOURCES
   gcconfig.cpp
   gccommon.cpp
