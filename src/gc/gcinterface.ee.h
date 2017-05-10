@@ -77,6 +77,11 @@ public:
     virtual
     void DisablePreemptiveGC(Thread * pThread) = 0;
 
+    // Gets the Thread instance for the current thread, or null if no thread
+    // instance is associated with this thread.
+    virtual
+    Thread* GetThread() = 0;
+
     // Retrieves the alloc context associated with a given thread.
     virtual
     gc_alloc_context * GetAllocContext(Thread * pThread) = 0;
