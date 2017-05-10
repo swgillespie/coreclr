@@ -420,6 +420,8 @@ public:
 
     virtual OBJECTHANDLE CreateDependentHandle(Object* primary, Object* secondary) = 0;
 
+    virtual void RelocateAsyncPinnedHandles(IGCHandleStore *pTarget) = 0;
+
     virtual ~IGCHandleStore() {};
 };
 
@@ -457,6 +459,8 @@ public:
     virtual Object* GetDependentHandleSecondary(OBJECTHANDLE handle) = 0;
 
     virtual Object* InterlockedCompareExchangeObjectInHandle(OBJECTHANDLE handle, Object* object, Object* comparandObject) = 0;
+
+    virtual bool HandleAsyncPinnedHandles() = 0;
 };
 
 // IGCHeap is the interface that the VM will use when interacting with the GC.

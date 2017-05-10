@@ -1286,9 +1286,9 @@ uint32_t HndCountAllHandles(BOOL fUseLocks)
     return uCount;
 }
 
-#ifndef FEATURE_REDHAWK
 BOOL  Ref_HandleAsyncPinHandles()
 {
+#ifndef FEATURE_REDHAWK
     CONTRACTL
     {
         NOTHROW;
@@ -1308,10 +1308,14 @@ BOOL  Ref_HandleAsyncPinHandles()
     }
 
     return result;
+#else
+    return true;
+#endif // !FEATURE_REDHAWK
 }
 
 void  Ref_RelocateAsyncPinHandles(HandleTableBucket *pSource, HandleTableBucket *pTarget)
 {
+#ifndef FEATURE_REDHAWK
     CONTRACTL
     {
         NOTHROW;
@@ -1324,8 +1328,8 @@ void  Ref_RelocateAsyncPinHandles(HandleTableBucket *pSource, HandleTableBucket 
     {
         TableRelocateAsyncPinHandles(Table(pSource->pTable[n]), Table(pTarget->pTable[n]));
     }
-}
 #endif // !FEATURE_REDHAWK
+}
 
 /*--------------------------------------------------------------------------*/
 
