@@ -40,6 +40,7 @@
 
 typedef int BOOL;
 typedef uint32_t DWORD;
+typedef uint64_t DWORD64;
 
 // -----------------------------------------------------------------------------------------------------------
 // HRESULT subset.
