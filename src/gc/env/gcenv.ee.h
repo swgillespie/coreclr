@@ -50,6 +50,7 @@ public:
     static void EnablePreemptiveGC(Thread * pThread);
     static void DisablePreemptiveGC(Thread * pThread);
     static Thread* GetThread();
+    static bool TrapReturningThreads();
 
     static gc_alloc_context * GetAllocContext(Thread * pThread);
     static bool CatchAtSafePoint(Thread * pThread);

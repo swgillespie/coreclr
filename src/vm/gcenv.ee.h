@@ -32,6 +32,7 @@ public:
     void EnablePreemptiveGC(Thread * pThread);
     void DisablePreemptiveGC(Thread * pThread);
     Thread* GetThread();
+    bool TrapReturningThreads();
     gc_alloc_context * GetAllocContext(Thread * pThread);
     bool CatchAtSafePoint(Thread * pThread);
     void GcEnumAllocContexts(enum_alloc_context_func* fn, void* param);
