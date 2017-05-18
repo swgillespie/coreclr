@@ -169,7 +169,11 @@ inline BOOL ReJitManager::IsReJITEnabled()
 {
     LIMITED_METHOD_CONTRACT;
 
+#ifdef PROFILING_SUPPORTED
     return CORProfilerEnableRejit();
+#else
+    return false;
+#endif
 }
 
 inline ReJitManager::ReJitInfoHash::KeyIterator ReJitManager::GetBeginIterator(PTR_MethodDesc pMD) 

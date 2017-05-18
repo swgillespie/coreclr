@@ -2010,12 +2010,14 @@ PCODE ReJitManager::DoReJitIfNecessaryWorker(PTR_MethodDesc pMD)
         }
         else
         {
+#ifdef PROFILING_SUPPORTED
             BEGIN_PIN_PROFILER(CORProfilerPresent());
             hr = g_profControlBlock.pProfInterface->GetReJITParameters(
                 (ModuleID)pModule,
                 methodDef,
                 pFuncControl);
             END_PIN_PROFILER();
+#endif // PROFILING_SUPPORTED
         }
 
         if (FAILED(hr))
@@ -2136,6 +2138,8 @@ PCODE ReJitManager::DoReJit(ReJitInfo * pInfo)
 {
     STANDARD_VM_CONTRACT;
 
+    PCODE ret = NULL;
+
 #ifdef PROFILING_SUPPORTED
 
     INDEBUG(Dump("Inside DoRejit().  Dumping this ReJitManager\n"));
@@ -2174,7 +2178,6 @@ PCODE ReJitManager::DoReJit(ReJitInfo * pInfo)
     HRESULT hr = S_OK;
     BOOL fEESuspended = FALSE;
     BOOL fNotify = FALSE;
-    PCODE ret = NULL;
     while (true)
     {
         if (fEESuspended)
@@ -2307,6 +2310,7 @@ PCODE ReJitManager::DoReJit(ReJitInfo * pInfo)
     }
 #endif // PROFILING_SUPPORTED
 
+#ifdef FEATURE_EVENT_TRACE
     // Fire relevant ETW events
     if (fNotify)
     {
@@ -2318,6 +2322,8 @@ PCODE ReJitManager::DoReJit(ReJitInfo * pInfo)
             pCodeOfRejittedCode,
             pInfo->m_pShared->GetId());
     }
+#endif FEATURE_EVENT_TRACE
+
     return ret;
 }
 
