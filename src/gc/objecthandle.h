@@ -17,7 +17,7 @@
  */
 #include "handletable.h"
 
-#ifdef FEATURE_COMINTEROP
+#if 0 // [LOCAGC TODO] re-enable this
 #include <weakreference.h>
 #endif // FEATURE_COMINTEROP
 
