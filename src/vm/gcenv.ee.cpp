@@ -365,7 +365,7 @@ Thread* GCToEEInterface::GetThread()
 
 bool GCToEEInterface::TrapReturningThreads()
 {
-    return g_TrapReturningThreads;
+    return !!g_TrapReturningThreads;
 }
 
 struct BackgroundThreadStubArgs
