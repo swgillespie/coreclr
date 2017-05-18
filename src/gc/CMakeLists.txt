@@ -51,4 +51,4 @@ endif(CLR_CMAKE_PLATFORM_UNIX)
 
 convert_to_absolute_path(GC_SOURCES ${GC_SOURCES})
 
-add_library(gc_standalone STATIC ${GC_SOURCES})
+add_library(gc_standalone SHARED ${GC_SOURCES})
