@@ -24,7 +24,7 @@
 #if 0 // [LOCALGC TODO] CCW
 #include "comcallablewrapper.h"
 #endif // FEATURE_COMINTEROP
-#if 0 // [LOCALGC TODO] native overlapped
+#ifndef FEATURE_REDHAWK
 #include "nativeoverlapped.h"
 #endif // FEATURE_REDHAWK
 
