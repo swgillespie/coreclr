@@ -7262,6 +7262,8 @@ ClrDataAccess::GetDacGlobals()
         return CORDBG_E_MISSING_DEBUGGER_EXPORTS;
     }
 
+    // [LOCALGC TODO] hacks abound
+    rsrcSize += 1024;
     rsrcData = new (nothrow) BYTE[rsrcSize];
     if (rsrcData == NULL)
         return E_OUTOFMEMORY;
@@ -7299,7 +7301,7 @@ ClrDataAccess::GetDacGlobals()
     // This could fail if a different version of dacvars.h or vptr_list.h was used when building
     // mscordacwks.dll than when running DacTableGen.
 
-    if (offsetof(DacGlobals, Thread__vtAddr) != header.numGlobals * sizeof(ULONG))
+    if (offsetof(DacGlobals, Thread__vtAddr) != (header.numGlobals+1) * sizeof(ULONG))
     {
 #ifdef _DEBUG
         char szMsgBuf[1024];
@@ -7314,7 +7316,7 @@ ClrDataAccess::GetDacGlobals()
         goto Exit;
     }
 
-    if (sizeof(DacGlobals) != (header.numGlobals + header.numVptrs) * sizeof(ULONG))
+    if (sizeof(DacGlobals) != ((header.numGlobals + 1) + header.numVptrs) * sizeof(ULONG))
     {
 #ifdef _DEBUG
         char szMsgBuf[1024];
@@ -7987,7 +7989,8 @@ HRESULT DacHandleWalker::Init(UINT32 typemask)
 {
     SUPPORTS_DAC;
     
-    mMap = &g_HandleTableMap;
+    // [LOCALGC TODO]
+    mMap = nullptr;
     mTypeMask = typemask;
     
     return S_OK;

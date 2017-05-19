@@ -28,7 +28,7 @@
 #include "nativeoverlapped.h"
 #endif // FEATURE_REDHAWK
 
-GVAL_IMPL(HandleTableMap, g_HandleTableMap);
+HandleTableMap g_HandleTableMap;
 
 // Array of contexts used while scanning dependent handles for promotion. There are as many contexts as GC
 // heaps and they're allocated by Ref_Initialize and initialized during each GC by GcDhInitialScan.

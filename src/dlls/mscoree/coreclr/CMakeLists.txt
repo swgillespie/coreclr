@@ -147,6 +147,7 @@ endif(CLR_CMAKE_PLATFORM_LINUX)
 
 target_link_libraries(coreclr ${CORECLR_LIBRARIES}) 
 
+# [LOCALGC TODO] this is a hack to get dactablegen to shut up
 if(WIN32)
     # Add dac table & debug resource to coreclr
     get_include_directories(INC_DIR)

@@ -17,7 +17,7 @@
  */
 #include "handletable.h"
 
-#if 0 // [LOCAGC TODO] re-enable this
+#if 0 // [LOCAGC TODO] re-enable
 #include <weakreference.h>
 #endif // FEATURE_COMINTEROP
 
@@ -32,7 +32,7 @@ struct HandleTableMap
     uint32_t                    dwMaxIndex;
 };
 
-GVAL_DECL(HandleTableMap, g_HandleTableMap);
+extern HandleTableMap g_HandleTableMap;
 
 #define INITIAL_HANDLE_TABLE_ARRAY_SIZE 10
 

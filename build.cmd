@@ -95,7 +95,9 @@ set __BuildCoreLib=1
 set __BuildNative=1
 set __BuildTests=1
 set __BuildPackages=1
-set __BuildNativeCoreLib=1
+
+:: [LOCALGC TODO] crossgen is apparently broken
+set __BuildNativeCoreLib=0
 set __RestoreOptData=1
 
 REM Is this a portable build?
