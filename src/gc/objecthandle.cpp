@@ -21,7 +21,7 @@
 
 #include "gchandletableimpl.h"
 
-#ifdef FEATURE_COMINTEROP
+#if 0 // [LOCALGC TODO] re-enable this
 #include "comcallablewrapper.h"
 #endif // FEATURE_COMINTEROP
 #ifndef FEATURE_REDHAWK

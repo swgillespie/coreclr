@@ -767,10 +767,12 @@ FCIMPL1(VOID, MarshalNative::GCHandleInternalCheckDomain, OBJECTHANDLE handle)
     if (handle == NULL)
         FCThrowArgumentVoid(W("handle"), W("Argument_ArgumentZero"));
     
+#if 0 // [LOCALGC TODO] - HndGetHandleTableADIndex
     ADIndex index = HndGetHandleTableADIndex(HndGetHandleTable(handle));
 
     if (index.m_dwIndex != 1 && index != GetAppDomain()->GetIndex())
         FCThrowArgumentVoid(W("handle"), W("Argument_HandleLeak"));
+#endif
 }
 FCIMPLEND
 
