@@ -28,7 +28,7 @@
 #include "nativeoverlapped.h"
 #endif // FEATURE_REDHAWK
 
-GVAL_IMPL(HandleTableMap, g_HandleTableMap);
+HandleTableMap g_HandleTableMap;
 
 // Array of contexts used while scanning dependent handles for promotion. There are as many contexts as GC
 // heaps and they're allocated by Ref_Initialize and initialized during each GC by GcDhInitialScan.
@@ -1895,4 +1895,11 @@ OBJECTREF GetDependentHandleSecondary(OBJECTHANDLE handle)
     WRAPPER_NO_CONTRACT;
 
     return UNCHECKED_OBJECTREF_TO_OBJECTREF((_UNCHECKED_OBJECTREF)HndGetHandleExtraInfo(handle));
+}
+
+void PopulateHandleTableDacVars(GcDacVars* gcDacVars)
+{
+#ifndef DACCESS_COMPILE
+    gcDacVars->handle_table_map = reinterpret_cast<dac_handle_table_map*>(&g_HandleTableMap);
+#endif // DACCESS_COMPILE
 }

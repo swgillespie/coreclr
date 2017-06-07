@@ -2237,7 +2237,7 @@ private:
     ULONG32 m_instanceAge;
     
     // Handle table walking variables.
-    HandleTableMap *mMap;
+    dac_handle_table_map *mMap;
     int mIndex;
     UINT32 mTypeMask;
     int mGenerationFilter;

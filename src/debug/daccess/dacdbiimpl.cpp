@@ -7488,7 +7488,9 @@ void CALLBACK DacHandleWalker::EnumCallbackDac(PTR_UNCHECKED_OBJECTREF handle, u
 
         case HNDTYPE_DEPENDENT:
             data.dwType = (DWORD)CorHandleStrongDependent;
+#if 0 // [LOCALGC TODO] Handle table DAC
             data.i64ExtraData = GetDependentHandleSecondary(handle.GetAddr()).GetAddr();
+#endif
             break;
             
         case HNDTYPE_ASYNCPINNED:

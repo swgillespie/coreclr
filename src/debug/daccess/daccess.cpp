@@ -7987,7 +7987,7 @@ HRESULT DacHandleWalker::Init(UINT32 typemask)
 {
     SUPPORTS_DAC;
     
-    mMap = &g_HandleTableMap;
+    mMap = g_gcDacGlobals->handle_table_map;
     mTypeMask = typemask;
     
     return S_OK;
@@ -8048,7 +8048,8 @@ bool DacHandleWalker::FetchMoreHandles(HANDLESCANPROC callback)
     do
     {
         // Have we advanced past the end of the current bucket?
-        if (mMap && mIndex >= INITIAL_HANDLE_TABLE_ARRAY_SIZE)
+        // [LOCALGC TODO] Handle table DAC
+        if (mMap && mIndex >= 42 /* FIX THIS NUMBER */)
         {
             mIndex = 0;
             mMap = mMap->pNext;
@@ -8206,6 +8207,7 @@ void CALLBACK DacHandleWalker::EnumCallbackSOS(PTR_UNCHECKED_OBJECTREF handle, u
     
     data.Handle = TO_CDADDR(handle.GetAddr());
     data.Type = param->Type;
+#if 0 // [LOCALGC TODO] Handle table DAC
     if (param->Type == HNDTYPE_DEPENDENT)
         data.Secondary = GetDependentHandleSecondary(handle.GetAddr()).GetAddr();
 #ifdef FEATURE_COMINTEROP
@@ -8213,6 +8215,7 @@ void CALLBACK DacHandleWalker::EnumCallbackSOS(PTR_UNCHECKED_OBJECTREF handle, u
         data.Secondary = HndGetHandleExtraInfo(handle.GetAddr());
 #endif // FEATURE_COMINTEROP
     else
+#endif
         data.Secondary = 0;
     data.AppDomain = param->AppDomain;
     GetRefCountedHandleInfo((OBJECTREF)*handle, param->Type, &data.RefCount, &data.JupiterRefCount, &data.IsPegged, &data.StrongReference);

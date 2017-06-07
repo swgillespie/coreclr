@@ -320,7 +320,6 @@ namespace Loader
 #include "eeconfig.h"
 
 #include "spinlock.h"
-#include "objecthandle.h"
 #include "declsec.h"
 
 #ifdef FEATURE_COMINTEROP 
@@ -334,7 +333,6 @@ namespace Loader
 
 #include "eehash.h"
 
-#include "handletable.h"
 #include "vars.hpp"
 #include "eventstore.hpp"
 
