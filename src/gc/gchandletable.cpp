@@ -8,6 +8,7 @@
 #include "gchandletableimpl.h"
 #include "objecthandle.h"
 #include "handletablepriv.h"
+#include "gcinterface.dac.inl"
 
 GCHandleStore* g_gcGlobalHandleStore;
 
@@ -172,7 +173,7 @@ void GCHandleManager::SetDependentHandleSecondary(OBJECTHANDLE handle, Object* o
 
 Object* GCHandleManager::GetDependentHandleSecondary(OBJECTHANDLE handle)
 {
-    return OBJECTREFToObject(::GetDependentHandleSecondary(handle));
+    return ::GetDependentHandleSecondary(handle);
 }
 
 Object* GCHandleManager::InterlockedCompareExchangeObjectInHandle(OBJECTHANDLE handle, Object* object, Object* comparandObject)

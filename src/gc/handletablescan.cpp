@@ -23,6 +23,7 @@
 #ifndef FEATURE_REDHAWK
 #include "nativeoverlapped.h"
 #endif // FEATURE_REDHAWK
+#include "gcinterface.dac.inl"
 
 
 /****************************************************************************

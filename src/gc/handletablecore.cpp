@@ -21,6 +21,7 @@
 #endif // FEATURE_REDHAWK
 
 #include "handletablepriv.h"
+#include "gcinterface.dac.inl"
 
 /****************************************************************************
  *
@@ -263,67 +264,6 @@ BOOL TableCanFreeSegmentNow(HandleTable *pTable, TableSegment *pSegment)
 #endif // !DACCESS_COMPILE
 
 /*
- * BlockFetchUserDataPointer
- *
- * Gets the user data pointer for the first handle in a block.
- *
- */
-PTR_uintptr_t BlockFetchUserDataPointer(PTR__TableSegmentHeader pSegment, uint32_t uBlock, BOOL fAssertOnError)
-{
-    LIMITED_METHOD_DAC_CONTRACT;
-
-    // assume NULL until we actually find the data
-    PTR_uintptr_t pUserData = NULL;
-    // get the user data index for this block
-    uint32_t blockIndex = pSegment->rgUserData[uBlock];
-
-    // is there user data for the block?
-    if (blockIndex != BLOCK_INVALID)
-    {
-        // In DAC builds, we may not have the entire segment table mapped and in any case it will be quite
-        // large. Since we only need one element, we'll retrieve just that one element.  
-        pUserData = PTR_uintptr_t(PTR_TO_TADDR(pSegment) + offsetof(TableSegment, rgValue) + 
-                               (blockIndex * HANDLE_BYTES_PER_BLOCK));
-    }
-    else if (fAssertOnError)
-    {
-        // no user data is associated with this block
-        //
-        // we probably got here for one of the following reasons:
-        //  1) an outside caller tried to do a user data operation on an incompatible handle
-        //  2) the user data map in the segment is corrupt
-        //  3) the global type flags are corrupt
-        //
-        _ASSERTE(FALSE);
-    }
-
-    // return the result
-    return pUserData;
-}
-
-
-/*
- * HandleFetchSegmentPointer
- *
- * Computes the segment pointer for a given handle.
- *
- */
-__inline PTR__TableSegmentHeader HandleFetchSegmentPointer(OBJECTHANDLE handle)
-{
-    LIMITED_METHOD_DAC_CONTRACT;
-
-    // find the segment for this handle
-    PTR__TableSegmentHeader pSegment = PTR__TableSegmentHeader((uintptr_t)handle & HANDLE_SEGMENT_ALIGN_MASK);
-
-    // sanity
-    _ASSERTE(pSegment);
-
-    // return the segment pointer
-    return pSegment;
-}
-
-
-/*
  * HandleValidateAndFetchUserDataPointer
  *
  * Gets the user data pointer for the specified handle.
@@ -368,50 +308,6 @@ uintptr_t *HandleValidateAndFetchUserDataPointer(OBJECTHANDLE handle, uint32_t u
             pUserData = NULL;
         }
     }
-
-    // return the result
-    return pUserData;
-}
-
-/*
- * HandleQuickFetchUserDataPointer
- *
- * Gets the user data pointer for a handle.
- * Less validation is performed.
- *
- */
-PTR_uintptr_t HandleQuickFetchUserDataPointer(OBJECTHANDLE handle)
-{
-    WRAPPER_NO_CONTRACT;
-
-    /*
-        NOTHROW;
-        GC_NOTRIGGER;
-        MODE_ANY;
-    */
-    SUPPORTS_DAC;
-    
-    // get the segment for this handle
-    PTR__TableSegmentHeader pSegment = HandleFetchSegmentPointer(handle);
-
-    // find the offset of this handle into the segment
-    uintptr_t offset = (uintptr_t)handle & HANDLE_SEGMENT_CONTENT_MASK;
-
-    // make sure it is in the handle area and not the header
-    _ASSERTE(offset >= HANDLE_HEADER_SIZE);
-
-    // convert the offset to a handle index
-    uint32_t uHandle = (uint32_t)((offset - HANDLE_HEADER_SIZE) / HANDLE_SIZE);
-
-    // compute the block this handle resides in
-    uint32_t uBlock = uHandle / HANDLE_HANDLES_PER_BLOCK;
-
-    // fetch the user data for this block
-    PTR_uintptr_t pUserData = BlockFetchUserDataPointer(pSegment, uBlock, TRUE);
-
-    // if we got the user data block then adjust the pointer to be handle-specific
-    if (pUserData)
-        pUserData += (uHandle - (uBlock * HANDLE_HANDLES_PER_BLOCK));
 
     // return the result
     return pUserData;

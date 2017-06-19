@@ -61,8 +61,6 @@ struct HandleTableBucket
                                     (flag == VHT_STRONG)     || \
                                     (flag == VHT_PINNED))
 
-OBJECTREF GetDependentHandleSecondary(OBJECTHANDLE handle);
-
 #ifndef DACCESS_COMPILE
 void SetDependentHandleSecondary(OBJECTHANDLE handle, OBJECTREF secondary);
 #endif // !DACCESS_COMPILE
