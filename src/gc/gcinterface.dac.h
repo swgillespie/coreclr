@@ -49,6 +49,19 @@ public:
     uint8_t** m_FillPointers[NUMBERGENERATIONS + ExtraSegCount];
 };
 
+class dac_handle_table_bucket {
+  public:
+    uint8_t* pTable;
+    uint32_t HandleTableIndex;
+};
+
+class dac_handle_table_map {
+public:
+    DPTR(DPTR(dac_handle_table_bucket)) pBuckets;
+    DPTR(dac_handle_table_map) pNext;
+    uint32_t dwMaxIndex;
+};
+
 // Possible values of the current_c_gc_state dacvar, indicating the state of
 // a background GC.
 enum c_gc_state

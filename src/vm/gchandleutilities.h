@@ -428,5 +428,8 @@ public:
 
 #endif // !DACCESS_COMPILE
 
+// [LOCALGC TODO] find a better place for this
+void GCHandleValidatePinnedObject(OBJECTREF obj);
+
 #endif // _GCHANDLEUTILITIES_H_
 

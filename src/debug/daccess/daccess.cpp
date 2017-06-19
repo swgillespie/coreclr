@@ -29,6 +29,7 @@
 #endif
 
 #include "dwbucketmanager.hpp"
+#include "gcinterface.dac.inl"
 
 // To include definiton of IsThrowableThreadAbortException
 // #include <exstatecommon.h>
@@ -7987,7 +7988,7 @@ HRESULT DacHandleWalker::Init(UINT32 typemask)
 {
     SUPPORTS_DAC;
     
-    mMap = &g_HandleTableMap;
+    mMap = g_gcDacGlobals->handle_table_map;
     mTypeMask = typemask;
     
     return S_OK;
@@ -8048,7 +8049,8 @@ bool DacHandleWalker::FetchMoreHandles(HANDLESCANPROC callback)
     do
     {
         // Have we advanced past the end of the current bucket?
-        if (mMap && mIndex >= INITIAL_HANDLE_TABLE_ARRAY_SIZE)
+        // [LOCALGC TODO] Handle table DAC
+        if (mMap && mIndex >= 42 /* FIX THIS NUMBER */)
         {
             mIndex = 0;
             mMap = mMap->pNext;
