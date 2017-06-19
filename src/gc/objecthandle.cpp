@@ -1889,10 +1889,3 @@ bool HandleTableBucket::Contains(OBJECTHANDLE handle)
 }
 
 #endif // !DACCESS_COMPILE
-
-OBJECTREF GetDependentHandleSecondary(OBJECTHANDLE handle)
-{ 
-    WRAPPER_NO_CONTRACT;
-
-    return UNCHECKED_OBJECTREF_TO_OBJECTREF((_UNCHECKED_OBJECTREF)HndGetHandleExtraInfo(handle));
-}

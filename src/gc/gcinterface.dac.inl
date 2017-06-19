@@ -9,11 +9,10 @@
  *
  */
 template<typename TableSegmentHeaderType>
-DPTR(TableSegmentHeaderType) HandleFetchSegmentPointerImpl(OBJECTHANDLE handle)
+inline DPTR(TableSegmentHeaderType) HandleFetchSegmentPointerImpl(OBJECTHANDLE handle)
 {
-    using TableSegmentHeaderPtr = typename DPTR(TableSegmentHeaderType);
-
-    TableSegmentHeaderPtr pSegment = TableSegmentHeaderPtr((uintptr_t)handle & HANDLE_SEGMENT_ALIGN_MASK);
+    using PTR_TableSegmentHeader = DPTR(TableSegmentHeaderType);
+    PTR_TableSegmentHeader pSegment = PTR_TableSegmentHeader((uintptr_t)handle & HANDLE_SEGMENT_ALIGN_MASK);
     assert(pSegment);
     return pSegment;
 }
@@ -25,10 +24,12 @@ DPTR(TableSegmentHeaderType) HandleFetchSegmentPointerImpl(OBJECTHANDLE handle)
  *
  */
 template<typename TableSegmentHeaderType, typename TableSegmentType>
-DPTR(uintptr_t) BlockFetchUserDataPointerImpl(DPTR(TableSegmentHeaderType) pSegment, uint32_t uBlock, BOOL fAssertOnError)
+inline DPTR(uintptr_t) BlockFetchUserDataPointerImpl(DPTR(TableSegmentHeaderType) pSegment, uint32_t uBlock, BOOL fAssertOnError)
 {
+    using PTR_uintptr_t = DPTR(uintptr_t);
+
     // assume NULL until we actually find the data
-    DPTR(uintptr_t) pUserData = NULL;
+    PTR_uintptr_t pUserData = NULL;
     // get the user data index for this block
     uint32_t blockIndex = pSegment->rgUserData[uBlock];
 
@@ -37,8 +38,8 @@ DPTR(uintptr_t) BlockFetchUserDataPointerImpl(DPTR(TableSegmentHeaderType) pSegm
     {
         // In DAC builds, we may not have the entire segment table mapped and in any case it will be quite
         // large. Since we only need one element, we'll retrieve just that one element.  
-        pUserData = reinterpret_cast<DPTR(uintptr_t)>(PTR_TO_TADDR(pSegment) + offsetof(TableSegmentType, rgValue) + 
-                               (blockIndex * HANDLE_BYTES_PER_BLOCK));
+        pUserData = PTR_uintptr_t(PTR_TO_TADDR(pSegment) + offsetof(TableSegmentType, rgValue) + 
+                                 (blockIndex * HANDLE_BYTES_PER_BLOCK));
     }
     else if (fAssertOnError)
     {
@@ -65,7 +66,7 @@ DPTR(uintptr_t) BlockFetchUserDataPointerImpl(DPTR(TableSegmentHeaderType) pSegm
  *
  */
 template<typename TableSegmentHeaderType, typename TableSegmentType>
-DPTR(uintptr_t) HandleQuickFetchUserDataPointerImpl(OBJECTHANDLE handle)
+inline DPTR(uintptr_t) HandleQuickFetchUserDataPointerImpl(OBJECTHANDLE handle)
 {
     // get the segment for this handle
     DPTR(TableSegmentHeaderType) pSegment = HandleFetchSegmentPointerImpl<TableSegmentHeaderType>(handle);
@@ -100,7 +101,7 @@ DPTR(uintptr_t) HandleQuickFetchUserDataPointerImpl(OBJECTHANDLE handle)
  *
  */
 template<typename TableSegmentHeaderType, typename TableSegmentType>
-uintptr_t HndGetHandleExtraInfoImpl(OBJECTHANDLE handle)
+inline uintptr_t HndGetHandleExtraInfoImpl(OBJECTHANDLE handle)
 {
     // assume zero until we actually get it
     uintptr_t lExtraInfo = 0L;
@@ -119,30 +120,27 @@ uintptr_t HndGetHandleExtraInfoImpl(OBJECTHANDLE handle)
 }
 
 template<typename TableSegmentHeaderType, typename TableSegmentType>
-Object* GetDependentHandleSecondaryImpl(OBJECTHANDLE handle)
+inline Object* GetDependentHandleSecondaryImpl(OBJECTHANDLE handle)
 {
     return (Object*)HndGetHandleExtraInfoImpl<TableSegmentHeaderType, TableSegmentType>(handle);
 }
 
 #ifdef DACCESS_COMPILE
-    using TableSegmentType = dac_table_segment;
-    using TableSegmentHeaderType = dac_table_segment_header;
-#else
-    using TableSegmentType = TableSegment;
-    using TableSegmentHeaderType = _TableSegmentHeader;
+using TableSegment = dac_table_segment;
+using _TableSegmentHeader = dac_table_segment_header;
 #endif // DACCESS_COMPILE
 
 
-inline DPTR(TableSegmentHeaderType) HandleFetchSegmentPointer(OBJECTHANDLE handle)
+inline DPTR(_TableSegmentHeader) HandleFetchSegmentPointer(OBJECTHANDLE handle)
 {
-    return HandleFetchSegmentPointerImpl<TableSegmentHeaderType>(handle);
+    return HandleFetchSegmentPointerImpl<_TableSegmentHeader>(handle);
 }
 
-inline DPTR(uintptr_t) BlockFetchUserDataPointer(DPTR(TableSegmentHeaderType) pSegment, uint32_t uBlock, BOOL fAssertOnError)
+inline DPTR(uintptr_t) BlockFetchUserDataPointer(DPTR(_TableSegmentHeader) pSegment, uint32_t uBlock, BOOL fAssertOnError)
 {
     return BlockFetchUserDataPointerImpl<
-      TableSegmentHeaderType,
-      TableSegmentType
+      _TableSegmentHeader,
+      TableSegment 
     >(
       pSegment,
       uBlock,
@@ -152,10 +150,15 @@ inline DPTR(uintptr_t) BlockFetchUserDataPointer(DPTR(TableSegmentHeaderType) pS
 
 inline DPTR(uintptr_t) HandleQuickFetchUserDataPointer(OBJECTHANDLE handle)
 {
-    return HandleQuickFetchUserDataPointerImpl<TableSegmentHeaderType, TableSegmentType>(handle);
+    return HandleQuickFetchUserDataPointerImpl<_TableSegmentHeader, TableSegment>(handle);
+}
+
+inline uintptr_t HndGetHandleExtraInfo(OBJECTHANDLE handle)
+{
+    return HndGetHandleExtraInfoImpl<_TableSegmentHeader, TableSegment>(handle);
 }
 
 inline Object* GetDependentHandleSecondary(OBJECTHANDLE handle)
 {
-    return GetDependentHandleSecondaryImpl<TableSegmentHeaderType, TableSegmentType>(handle);
+    return GetDependentHandleSecondaryImpl<_TableSegmentHeader, TableSegment>(handle);
 }
