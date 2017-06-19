@@ -24,6 +24,8 @@
 #include "nativeoverlapped.h"
 #endif
 
+#include "gcinterface.dac.inl"
+
 /****************************************************************************
  *
  * FORWARD DECLARATIONS
@@ -563,32 +565,6 @@ uintptr_t HndCompareExchangeHandleExtraInfo(OBJECTHANDLE handle, uint32_t uType,
     return NULL;
 }
 #endif // !DACCESS_COMPILE
-
-/*
- * HndGetHandleExtraInfo
- *
- * Retrieves owner data from handle.
- *
- */
-uintptr_t HndGetHandleExtraInfo(OBJECTHANDLE handle)
-{
-    WRAPPER_NO_CONTRACT;
-
-    // assume zero until we actually get it
-    uintptr_t lExtraInfo = 0L;
-
-    // fetch the user data slot for this handle
-    PTR_uintptr_t pUserData = HandleQuickFetchUserDataPointer(handle);
-
-    // if we did then copy the value
-    if (pUserData)
-    {
-        lExtraInfo = *(pUserData);
-    }
-
-    // return the value to our caller
-    return lExtraInfo;
-}
 
 /*
  * HndGetHandleTable

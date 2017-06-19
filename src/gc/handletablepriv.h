@@ -709,16 +709,6 @@ __inline void BlockUnlock(TableSegment *pSegment, uint32_t uBlock)
     pSegment->rgLocks[uBlock] = bLocks - 1;
 }
 
-
-/*
- * BlockFetchUserDataPointer
- *
- * Gets the user data pointer for the first handle in a block.
- *
- */
-PTR_uintptr_t BlockFetchUserDataPointer(PTR__TableSegmentHeader pSegment, uint32_t uBlock, BOOL fAssertOnError);
-
-
 /*
  * HandleValidateAndFetchUserDataPointer
  *
@@ -727,17 +717,6 @@ PTR_uintptr_t BlockFetchUserDataPointer(PTR__TableSegmentHeader pSegment, uint32
  *
  */
 uintptr_t *HandleValidateAndFetchUserDataPointer(OBJECTHANDLE handle, uint32_t uTypeExpected);
-
-
-/*
- * HandleQuickFetchUserDataPointer
- *
- * Gets the user data pointer for a handle.
- * Less validation is performed.
- *
- */
-PTR_uintptr_t HandleQuickFetchUserDataPointer(OBJECTHANDLE handle);
-
 
 /*
  * HandleQuickSetUserData

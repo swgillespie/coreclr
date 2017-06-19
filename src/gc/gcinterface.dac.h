@@ -131,6 +131,18 @@ public:
     dac_generation generation_table[1];
 };
 
+class dac_table_segment
+{
+public:
+    uint8_t rgValue[42];
+};
+
+class dac_table_segment_header : public dac_table_segment
+{
+public:
+    uint8_t rgUserData[42];
+};
+
 
 // The actual structure containing the DAC variables. When DACCESS_COMPILE is not
 // defined (i.e. the normal runtime build), this structure contains pointers to the
