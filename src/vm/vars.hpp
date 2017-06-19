@@ -334,6 +334,14 @@ class REF : public OBJECTREF
 
 #endif // _DEBUG_IMPL
 
+#if defined(USE_CHECKED_OBJECTREFS) && !defined(_NOVM)
+#define OBJECTREF_TO_UNCHECKED_OBJECTREF(objref)    (*((_UNCHECKED_OBJECTREF*)&(objref)))
+#define UNCHECKED_OBJECTREF_TO_OBJECTREF(obj)       (OBJECTREF(obj))
+#else
+#define OBJECTREF_TO_UNCHECKED_OBJECTREF(objref)    (objref)
+#define UNCHECKED_OBJECTREF_TO_OBJECTREF(obj)       (obj)
+#endif
+
 
 // <TODO> Get rid of these!  Don't use them any more!</TODO>
 #define MAX_CLASSNAME_LENGTH    1024

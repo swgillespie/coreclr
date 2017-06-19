@@ -470,7 +470,6 @@ extern DummyGlobalContract ___contract;
 #include "object.inl"
 #include "clsload.inl"
 #include "domainfile.inl"
-#include "handletable.inl"
 #include "method.inl"
 #include "stackprobe.inl"
 #include "syncblk.inl"
