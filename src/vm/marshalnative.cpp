@@ -30,7 +30,6 @@
 #include "gcheaputilities.h"
 #include "security.h"
 #include "dbginterface.h"
-#include "objecthandle.h"
 #include "marshalnative.h"
 #include "fcall.h"
 #include "dllimportcallback.h"
