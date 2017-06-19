@@ -32,7 +32,7 @@ struct HandleTableMap
     uint32_t                    dwMaxIndex;
 };
 
-GVAL_DECL(HandleTableMap, g_HandleTableMap);
+extern HandleTableMap g_HandleTableMap;
 
 #define INITIAL_HANDLE_TABLE_ARRAY_SIZE 10
 
@@ -69,8 +69,6 @@ void SetDependentHandleSecondary(OBJECTHANDLE handle, OBJECTREF secondary);
 uint32_t     GetVariableHandleType(OBJECTHANDLE handle);
 void         UpdateVariableHandleType(OBJECTHANDLE handle, uint32_t type);
 uint32_t     CompareExchangeVariableHandleType(OBJECTHANDLE handle, uint32_t oldType, uint32_t newType);
-
-void GCHandleValidatePinnedObject(OBJECTREF obj);
 
 /*
  * Convenience prototypes for using the global handles
