@@ -119,18 +119,6 @@ set(VM_SOURCES_DAC_AND_WKS_COMMON
     zapsig.cpp
 )
 
-set( GC_SOURCES_DAC_AND_WKS_COMMON
-  ../gc/gcconfig.cpp
-  ../gc/gccommon.cpp
-  ../gc/gcscan.cpp
-  ../gc/gcsvr.cpp
-  ../gc/gcwks.cpp
-  ../gc/handletable.cpp
-  ../gc/handletablecore.cpp
-  ../gc/handletablescan.cpp
-  ../gc/objecthandle.cpp
-  ../gc/softwarewritewatch.cpp)
-
 if(FEATURE_READYTORUN)
     list(APPEND VM_SOURCES_DAC_AND_WKS_COMMON
         readytoruninfo.cpp
@@ -142,9 +130,6 @@ set(VM_SOURCES_DAC
     contexts.cpp
     threaddebugblockinginfo.cpp
 )
-
-set(GC_SOURCES_DAC
-    ${GC_SOURCES_DAC_AND_WKS_COMMON})
 
 set(VM_SOURCES_WKS
     ${VM_SOURCES_DAC_AND_WKS_COMMON}
@@ -259,7 +244,16 @@ set(VM_SOURCES_WKS
 )
 
 set(GC_SOURCES_WKS
-    ${GC_SOURCES_DAC_AND_WKS_COMMON}
+    ../gc/gcconfig.cpp
+    ../gc/gccommon.cpp
+    ../gc/gcscan.cpp
+    ../gc/gcsvr.cpp
+    ../gc/gcwks.cpp
+    ../gc/handletable.cpp
+    ../gc/handletablecore.cpp
+    ../gc/handletablescan.cpp
+    ../gc/objecthandle.cpp
+    ../gc/softwarewritewatch.cpp
     ../gc/gchandletable.cpp
     ../gc/gceesvr.cpp
     ../gc/gceewks.cpp
@@ -513,12 +507,6 @@ if (NOT FEATURE_STANDALONE_GC_ONLY)
         ${GC_SOURCES_WKS}
     )
 endif(NOT FEATURE_STANDALONE_GC_ONLY)
-
-# The DAC does need GC sources in order to link correctly, even if
-# it's not used.
-list(APPEND VM_SOURCES_DAC
-    ${GC_SOURCES_DAC}
-)
 
 convert_to_absolute_path(VM_SOURCES_WKS ${VM_SOURCES_WKS})
 convert_to_absolute_path(VM_SOURCES_WKS_ARCH_ASM ${VM_SOURCES_WKS_ARCH_ASM})

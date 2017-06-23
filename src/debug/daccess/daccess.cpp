@@ -7932,9 +7932,6 @@ STDAPI OutOfProcessExceptionEventDebuggerLaunchCallback(__in PDWORD pContext,
 }
 
 // DacHandleEnum
-
-// TODO(Local GC) - The DAC should not include GC headers
-#include "../../gc/handletablepriv.h"
 #include "comcallablewrapper.h"
 
 DacHandleWalker::DacHandleWalker()
