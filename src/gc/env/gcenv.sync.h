@@ -2,6 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#ifndef __GCENV_STRUCTS_H__
+#define __GCENV_STRUCTS_H__
+
 // -----------------------------------------------------------------------------------------------------------
 //
 // Helper classes expected by the GC
@@ -143,3 +146,5 @@ private:
     HANDLE  m_hEvent;
     bool    m_fInitialized;
 };
+
+#endif // __GCENV_STRUCTS_H__

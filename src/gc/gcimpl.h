@@ -6,6 +6,8 @@
 #ifndef GCIMPL_H_
 #define GCIMPL_H_
 
+#include "gcenv.h"
+
 #ifdef SERVER_GC
 #define MULTIPLE_HEAPS 1
 #endif  // SERVER_GC

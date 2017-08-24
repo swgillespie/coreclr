@@ -425,7 +425,7 @@ typedef PTR_PTR_Object PTR_UNCHECKED_OBJECTREF;
 
 #define VALIDATEOBJECTREF(_objref) (void)_objref;
 
-#define VOLATILE(T) T volatile
+#define VOLATILE(T) Volatile<T>
 
 //
 // This code is extremely compiler- and CPU-specific, and will need to be altered to 

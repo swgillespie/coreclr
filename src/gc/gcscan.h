@@ -14,6 +14,7 @@
 #ifndef _GCSCAN_H_
 #define _GCSCAN_H_
 
+#include "gcenv.h"
 #include "gc.h"
 
 // Scanning dependent handles for promotion can become a complex operation due to cascaded dependencies and

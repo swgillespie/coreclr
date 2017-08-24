@@ -2,6 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#ifndef __GCENV_H__
+#define __GCENV_H__
+
 #if defined(_DEBUG)
 #ifndef _DEBUG_IMPL
 #define _DEBUG_IMPL 1
@@ -24,6 +27,7 @@
 #include "gcenv.sync.h"
 #include "gcinterface.h"
 #include "gcenv.ee.h"
+#include "volatile.h"
 
 #define MAX_LONGPATH 1024
 
@@ -70,3 +74,5 @@
 
 #include "etmdummy.h"
 #define ETW_EVENT_ENABLED(e,f) false
+
+#endif // __GCENV_H__
