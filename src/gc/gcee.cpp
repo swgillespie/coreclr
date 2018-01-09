@@ -687,6 +687,29 @@ bool GCHeap::RuntimeStructuresValid()
     return GCScan::GetGcRuntimeStructuresValid();
 }
 
+void GCHeap::ControlEvents(bool enable, int keyword, GCEventLevel level)
+{
+    if (enable)
+    {
+        GCEventStatus::Enable(GCEventProvider_Default, keyword, level);
+    }
+    else
+    {
+        GCEventStatus::Disable(GCEventProvider_Default, keyword, level);
+    }
+}
+
+void GCHeap::ControlPrivateEvents(bool enable, int keyword, GCEventLevel level)
+{
+    if (enable)
+    {
+        GCEventStatus::Enable(GCEventProvider_Private, keyword, level);
+    }
+    else
+    {
+        GCEventStatus::Disable(GCEventProvider_Private, keyword, level);
+    }
+}
 
 #endif // !DACCESS_COMPILE
 
