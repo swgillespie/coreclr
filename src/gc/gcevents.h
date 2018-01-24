@@ -29,5 +29,8 @@ KNOWN_EVENT(GCFullNotify_V1, GCEventProvider_Private, GCEventLevel_Information, 
 KNOWN_EVENT(PrvSetGCHandle, GCEventProvider_Private, GCEventLevel_Information, GCEventKeyword_GCHandlePrivate)
 KNOWN_EVENT(PrvDestroyGCHandle, GCEventProvider_Private, GCEventLevel_Information, GCEventKeyword_GCHandlePrivate)
 
+KNOWN_EVENT(GCStart_V2, GCEventProvider_Default, GCEventLevel_Information, GCEventKeyword_GC)
+KNOWN_EVENT(GCGenerationRange, GCEventProvider_Default, GCEventLevel_Information, GCEventKeyword_GCHeapSurvivalAndMovement)
+
 #undef KNOWN_EVENT
 #undef DYNAMIC_EVENT
