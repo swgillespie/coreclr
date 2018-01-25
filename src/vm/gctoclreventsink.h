@@ -61,6 +61,7 @@ class GCToCLREventSink : public IGCToCLREventSink
         uint32_t sinkBlockCount,
         uint32_t gcHandleCount);
     void FireGCCreateSegment_V1(void* address, size_t size, uint32_t type);
+    void FireGCFreeSegment_V1(void* address);
 };
 
 extern GCToCLREventSink g_gcToClrEventSink;
