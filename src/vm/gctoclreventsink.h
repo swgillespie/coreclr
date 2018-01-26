@@ -9,6 +9,7 @@
 
 class GCToCLREventSink : public IGCToCLREventSink
 {
+    void FireDynamicEvent(const char* eventName, void* payload, uint32_t payloadSize);
     void FireGCPerHeapHistory_V3(void *freeListAllocated,
                                  void *freeListRejected,
                                  void *endOfSegAllocated,
