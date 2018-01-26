@@ -65,6 +65,7 @@ class GCToCLREventSink : public IGCToCLREventSink
     void FireGCCreateConcurrentThread_V1();
     void FireGCTerminateConcurrentThread_V1();
     void FireGCTriggered(uint32_t reason);
+    void FireGCMarkWithType(uint32_t heapNum, uint32_t type, uint64_t bytes);
 };
 
 extern GCToCLREventSink g_gcToClrEventSink;
